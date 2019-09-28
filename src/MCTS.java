@@ -10,8 +10,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
-import main.support.HeuristicFunction;
-import main.support.PlayoutSelection;
+import HeuristicFunction;
+import PlayoutSelection;
 
 public class MCTS {
 	private Random random;

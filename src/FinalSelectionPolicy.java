@@ -1,4 +1,4 @@
-package main;
+ 
 
 public enum FinalSelectionPolicy {
 	maxChild, // The child with highest SCORE
