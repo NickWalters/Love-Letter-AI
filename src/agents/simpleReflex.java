@@ -108,7 +108,7 @@ public class simpleReflex implements Agent{
 		  }
 		  
 		  else if (alreadyDecided == false) {
-			  if(handCard > drawnCard) {
+			  if(handCard <= drawnCard) {
 				  play = c;
 			  }
 			  else {
@@ -129,7 +129,7 @@ public class simpleReflex implements Agent{
 		  try {
 			  switch(play) {
 			        case GUARD:
-			        	act = Action.playGuard(myIndex, target, Card.values()[rand.nextInt(7)+1]);
+			        	act = Action.playGuard(myIndex, target, Card.values()[guess(current)]);
 			        	break;
 		            case PRIEST:
 		            	act = Action.playPriest(myIndex, target);
@@ -182,7 +182,7 @@ public class simpleReflex implements Agent{
   
   
   // returns a guess for the guard. the guess is in the form of a Card
-  public Card guess(State current) {
+  public int guess(State current) {
 	  Card[] unseenCards = current.unseenCards();
 	  int[] deck = {0,0,0,0,0,0,0,0};
 	  
@@ -225,13 +225,7 @@ public class simpleReflex implements Agent{
 	  {
 	      if ( deck[i] >= deck[largest] ) largest = i;
 	  }
-	  
-	  for(Card card: unseenCards) {
-		  if(card.value()-1 == largest) {
-			  return card;
-		  }
-	  }
-	  return unseenCards[2];
+	  return largest;
   }
   
   
