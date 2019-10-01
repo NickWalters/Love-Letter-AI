@@ -114,8 +114,18 @@ public class simpleReflex implements Agent{
 			  else {
 				  play = current.getCard(myIndex);
 			  }
+			  // if you have a princess, play other card
+			  if(handCard ==8 || drawnCard==8) {
+				  if(handCard == 8) {
+					  play = c;
+				  }
+				  else {
+					  play = current.getCard(myIndex);
+				  }
+			  }
 		  }
 		  int target = rand.nextInt(current.numPlayers());
+		  
 		  try {
 			  switch(play) {
 			        case GUARD:
@@ -154,7 +164,7 @@ public class simpleReflex implements Agent{
 	  int maxScore = -1;
 	  int maxPlayer = -1;
 	  
-	  for(int i=0; i<= playerCount; i++) {
+	  for(int i=0; i<= playerCount-1; i++) {
 		  if(current.score(i) > maxScore) {
 			  if(i == myIndex) {
 				  continue;
@@ -168,6 +178,60 @@ public class simpleReflex implements Agent{
 		  return rand.nextInt(current.numPlayers());
 	  }
 	  return maxPlayer;
+  }
+  
+  
+  // returns a guess for the guard. the guess is in the form of a Card
+  public Card guess(State current) {
+	  Card[] unseenCards = current.unseenCards();
+	  int[] deck = {0,0,0,0,0,0,0,0};
+	  
+	  for(Card card: unseenCards){
+		  try {
+			  switch(card.value()) {
+			    case 1:
+			    	continue;
+			  	//priest
+			  	case 2:
+			  		deck[1] = deck[1] + 1;
+			  	//baron
+			  	case 3:
+			  		deck[2] = deck[2] + 1;
+			  	//hand-maid
+			  	case 4:
+			  		deck[3] = deck[3] + 1;
+			  	//prince
+			  	case 5:
+			  		deck[4] = deck[4] + 1;
+			  	//king
+			  	case 6:
+			  		deck[5] = deck[5] + 1;
+			  	//countess
+			  	case 7:
+			  		deck[6] = deck[6] + 1;
+			  	// princess
+			  	case 8:
+			  		deck[7] = deck[7] + 1;
+			  }
+			  
+		  }catch(Exception e){/*do nothing, just try again*/} 
+	  }
+	  // minus the agents current hand
+	  int indexOfDeduction = current.getCard(myIndex).value()-1;
+	  deck[indexOfDeduction] = deck[indexOfDeduction] - 1;
+	  
+	  int largest = 0;
+	  for (int i=0; i<8; i++)
+	  {
+	      if ( deck[i] >= deck[largest] ) largest = i;
+	  }
+	  
+	  for(Card card: unseenCards) {
+		  if(card.value()-1 == largest) {
+			  return card;
+		  }
+	  }
+	  return unseenCards[2];
   }
   
   
