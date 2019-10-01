@@ -1,3 +1,4 @@
+package agents;
 import agents.Node;
 
 public class Tree {

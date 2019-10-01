@@ -87,7 +87,7 @@ System.out.println("New Round, scores are:\nplayer 0:"+gameState.score(0)+"\npla
    * The agent implementations should be in the default package.
    * */
   public static void main(String[] args){
-    Agent[] agents = {new agents.RandomAgent(),new agents.RandomAgent(), new agents.RandomAgent(), new agents.RandomAgent()};
+    Agent[] agents = {new agents.RandomAgent(),new agents.RandomAgent(), new agents.RandomAgent(), new agents.simpleReflex()};
     LoveLetter env = new LoveLetter();
     StringBuffer log = new StringBuffer("A simple game for four random agents:\n");
     int[] results = env.playGame(agents);

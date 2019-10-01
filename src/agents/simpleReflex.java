@@ -8,6 +8,7 @@ import java.util.Random;
  * */
 
 // @author Nicholas Walters
+
 public class simpleReflex implements Agent{
 
   private Random rand;
@@ -56,7 +57,14 @@ public class simpleReflex implements Agent{
   
 
   
+  /**
+    ToDo : 1, Save values of other opponents cards when shown, and make decisions based on knowing other peoples deck
+       
+      2, Make decisions based on card ranges, and the amount of discarded cards
+          e.g there is only 4 guards, there is only 1 countess
+          if a countess has already been played, then it cannot occur again
   
+  */
   
   /**
    * Perform an action after drawing a card from the deck
@@ -66,123 +74,106 @@ public class simpleReflex implements Agent{
    * */
   public Action playCard(Card c){
 	  Action act = null;
-	    
-	    int target = rand.nextInt(current.numPlayers());
-	    Card drawnCard = c;
-	    Card handCard = current.getCard(myIndex);
-	    while(!current.legalAction(act, c)){
-	    try {
-	    	switch(drawnCard) {
-	    		case GUARD:
-	    			// as guard is the lowest value, discard it straight away
-	    			act = Action.playGuard(myIndex, target, Card.values()[rand.nextInt(7)+1]);
-	    			break;
-	    		case PRIEST:
-	    			// select the higher value card
-	    			if(compareCards(handCard, drawnCard)) {
-	    				act = playHand(handCard, target);
-	    				break;
-	    			}else {
-	    				act = Action.playPriest(myIndex, target);
-	    				break;
-	    			}
-	    		case BARON:
-	    			// select the higher value card
-	    			if(compareCards(handCard, drawnCard)) {
-	    				act = playHand(handCard, target);
-	    				break;
-	    			}else {
-	    				act = Action.playBaron(myIndex, target);
-	    				break;
-	    			}
-	    		case HANDMAID:
-	    			// select the higher value card
-	    			if(compareCards(handCard, drawnCard)) {
-	    				act = playHand(handCard, target);
-	    				break;
-	    			}else {
-	    				act = Action.playHandmaid(myIndex);
-	    				break;
-	    			}
-	    		case PRINCE:
-	    			// select the higher value card
-	    			if(compareCards(handCard, drawnCard)) {
-	    				act = playHand(handCard, target);
-	    				break;
-	    			}else {
-	    				act = Action.playPrince(myIndex, target);
-	    				break;
-	    			}
-	    		case KING:
-	    			// select the higher value card
-	    			if(compareCards(handCard, drawnCard)) {
-	    				act = playHand(handCard, target);
-	    				break;
-	    			}else {
-	    				act = Action.playKing(myIndex, target);
-	    				break;
-	    			}
-	    		case COUNTESS:
-	    			// if you have a prince, or king, or princess, then play countess
-	    			if((handCard.value() > 4)) {
-	    				act = Action.playCountess(myIndex);
-	    				break;
-	    			}else {
-	    				// keep the high value countess, discard other card
-	    				act = playHand(handCard, target);
-	    				break;
-	    			}
-			default:
-				break;
-	    	}
-	    }catch(IllegalActionException e){/*do nothing, just try again*/}
-	    }
-	    return act;
-  }
-
-
-  public Action playHand(Card handCard, int target) {
-	  Action act = null;
-	  try{
-	        switch(handCard){
-	          case GUARD:
-	            act = Action.playGuard(myIndex, target, Card.values()[rand.nextInt(7)+1]);
-	            break;
-	          case PRIEST:
-	            act = Action.playPriest(myIndex, target);
-	            break;
-	          case BARON:  
-	            act = Action.playBaron(myIndex, target);
-	            break;
-	          case HANDMAID:
-	            act = Action.playHandmaid(myIndex);
-	            break;
-	          case PRINCE:  
-	            act = Action.playPrince(myIndex, target);
-	            break;
-	          case KING:
-	            act = Action.playKing(myIndex, target);
-	            break;
-	          case COUNTESS:
-	            act = Action.playCountess(myIndex);
-	            break;
-	          default:
-	            act = null;//never play princess
-	        }
-	      }catch(IllegalActionException e){/*do nothing, just try again*/}  
+	  Card play = null;
+	  int drawnCard = c.value();
+	  int handCard = current.getCard(myIndex).value();
+	  boolean alreadyDecided = false;
+	  
+	  while(!current.legalAction(act, c)) {
+		  
+		  // this checks if you have a countess needing to be played
+		  if((handCard == 7 || drawnCard == 7)) {
+		        if(handCard == 6 || drawnCard == 6) {
+		          alreadyDecided = true;
+		          if(drawnCard == 7) play = c;
+		          else play = current.getCard(myIndex);
+		        }
+		        if(handCard == 5 || drawnCard == 5) {
+		          alreadyDecided = true;
+		          if(drawnCard == 7) play = c;
+		          else play = current.getCard(myIndex);
+		        }
+		      }
+		  
+		  // this checks if you can play a hand maid!
+		  if((handCard == 4) || (drawnCard == 4) && alreadyDecided == false) {
+			  if(drawnCard == 4) {
+				  play = c;
+				  alreadyDecided = true;
+			  }
+			  else {
+				  play = current.getCard(myIndex);
+				  alreadyDecided = true;
+			  }
+		  }
+		  
+		  else if (alreadyDecided == false) {
+			  if(handCard > drawnCard) {
+				  play = c;
+			  }
+			  else {
+				  play = current.getCard(myIndex);
+			  }
+		  }
+		  int target = rand.nextInt(current.numPlayers());
+		  try {
+			  switch(play) {
+			        case GUARD:
+			        	act = Action.playGuard(myIndex, target, Card.values()[rand.nextInt(7)+1]);
+			        	break;
+		            case PRIEST:
+		            	act = Action.playPriest(myIndex, target);
+		            	break;
+		            case BARON:  
+		            	act = Action.playBaron(myIndex, target);
+		            	break;		          
+		            case HANDMAID:
+		            	act = Action.playHandmaid(myIndex);
+		            	break;
+		            case PRINCE:  
+		            	act = Action.playPrince(myIndex, target);
+		            	break;
+		            case KING:
+		            	act = Action.playKing(myIndex, target);
+		            	break;
+		            case COUNTESS:
+		            	act = Action.playCountess(myIndex);
+		            	break;
+		            default:
+		            	act = null;//never play princess
+			  }
+		  }catch(IllegalActionException e){/*do nothing, just try again*/} 
+	  	}
 	  return act;
-  }
-
-
-// returns true if drawnCard is greater value
-	public boolean compareCards(Card handCard, Card drawnCard) {
-	  if(drawnCard.value() > handCard.value()) {
-		  return true;
-	  }else {
-		  // still also works fine if handCard==drawnCard
-		  return false;
-	  }
 	}
+  
+  
+  // returns playerIndex of target player to try and eliminate
+  public int topScorer(State current) {
+	  int playerCount = current.numPlayers();
+	  int maxScore = -1;
+	  int maxPlayer = -1;
+	  
+	  for(int i=0; i<= playerCount; i++) {
+		  if(current.score(i) > maxScore) {
+			  if(i == myIndex) {
+				  continue;
+			  }
+			  maxScore = current.score(i);
+			  maxPlayer = i;
+		  }
+	  }
+	  
+	  if(maxScore == 0) {
+		  return rand.nextInt(current.numPlayers());
+	  }
+	  return maxPlayer;
+  }
+  
+  
 }
+
+
+
 
 
