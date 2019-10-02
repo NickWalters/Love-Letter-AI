@@ -163,21 +163,39 @@ public class simpleReflex implements Agent{
 		            				minScore = cardValue;
 		            				minPlayer = player;
 		            			}
-		            			act = Action.playBaron(myIndex, minPlayer);
-		            			break;
 		            		}
+		            		act = Action.playBaron(myIndex, minPlayer);
+	            			break;
 		            	}
 		            	else {
 		            		act = Action.playBaron(myIndex, target);
 		            		break;
-		            	}
-		            	break;		          
+		            	}	          
 		            case HANDMAID:
 		            	act = Action.playHandmaid(myIndex);
 		            	break;
-		            case PRINCE:  
-		            	act = Action.playPrince(myIndex, target);
-		            	break;
+		            case PRINCE:
+		            	int maximumPlayer = -1;
+		            	int maximumValue = -1;
+		            	if(seenCards.size() > 0) {
+		            		for(int player: seenCards.keySet()) {
+		            			Card card = seenCards.get(player);
+		            			int cardValue = card.value();
+		            			if(cardValue > maximumValue) {
+		            				maximumValue = cardValue;
+		            				maximumPlayer = player;
+		            			}
+		            		}if(maximumValue <= 6) {
+		            			if(!current.eliminated(maximumPlayer)) {
+		            				act = Action.playPrince(myIndex, maximumPlayer);
+		            				break;
+		            			}	
+		            		}
+		            	}
+		            	else {
+		            		act = Action.playPrince(myIndex, target);
+			            	break;
+		            	}	
 		            case KING:
 		            	int maxValue = 0;
 		            	int maxPlayer = -1;
