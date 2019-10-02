@@ -139,11 +139,13 @@ public class simpleReflex implements Agent{
 			        			int cardValue = card.value();
 			        			if(!current.eliminated(player)) {
 			        				act = Action.playGuard(myIndex, player, card);
+			        				break;
 			        			}
 			        		}
 			        	}
 			        	else {
 			        		act = Action.playGuard(myIndex, guardTarget, Card.values()[guess(current)]);
+			        		break;
 			        	}
 			        	break;
 		            case PRIEST:
@@ -162,10 +164,12 @@ public class simpleReflex implements Agent{
 		            				minPlayer = player;
 		            			}
 		            			act = Action.playBaron(myIndex, minPlayer);
+		            			break;
 		            		}
 		            	}
 		            	else {
 		            		act = Action.playBaron(myIndex, target);
+		            		break;
 		            	}
 		            	break;		          
 		            case HANDMAID:
@@ -175,8 +179,32 @@ public class simpleReflex implements Agent{
 		            	act = Action.playPrince(myIndex, target);
 		            	break;
 		            case KING:
-		            	act = Action.playKing(myIndex, target);
-		            	break;
+		            	int maxValue = 0;
+		            	int maxPlayer = -1;
+		            	if(seenCards.size() > 0) {
+		            		for(int player: seenCards.keySet()) {
+		            			Card card = seenCards.get(player);
+		            			int cardValue = card.value();
+		            			if(cardValue > maxValue) {
+		            				if(!current.eliminated(player)) {
+		            					maxValue = cardValue;
+		            					maxPlayer = player;
+		            				}	
+		            			}
+		            		}
+		            		if(maxValue >= current.getCard(myIndex).value()) {
+		            			Action.playKing(myIndex, maxPlayer);
+		            			break;
+		            		}
+		            		else {
+		            			Action.playKing(myIndex, target);
+		            			break;
+		            		}
+		            	}
+		            	else {
+		            		act = Action.playKing(myIndex, target);
+			            	break;
+		            	}	
 		            case COUNTESS:
 		            	act = Action.playCountess(myIndex);
 		            	break;
