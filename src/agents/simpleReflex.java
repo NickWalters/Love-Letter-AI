@@ -1,6 +1,7 @@
 package agents;
 import loveletter.*;
-import java.util.Random;
+
+import java.util.*;
 
 /**
  * An interface for representing an agent in the game Love Letter
@@ -15,6 +16,7 @@ public class simpleReflex implements Agent{
   private State current;
   private int myIndex;
 
+  HashMap<Integer, Card> seenCards = new HashMap<Integer, Card>();
   
   //0 place default constructor
   public simpleReflex(){
@@ -38,6 +40,7 @@ public class simpleReflex implements Agent{
   public void newRound(State start){
     current = start;
     myIndex = current.getPlayerIndex();
+    seenCards.clear();
   }
 
   
@@ -125,17 +128,45 @@ public class simpleReflex implements Agent{
 			  }
 		  }
 		  int target = rand.nextInt(current.numPlayers());
-		  
 		  try {
 			  switch(play) {
 			        case GUARD:
-			        	act = Action.playGuard(myIndex, target, Card.values()[guess(current)]);
+			        	int guardTarget = rand.nextInt(current.numPlayers());
+			        	
+			        	if(seenCards.size() > 0) {
+			        		for(int player: seenCards.keySet()) {
+			        			Card card = seenCards.get(player);
+			        			int cardValue = card.value();
+			        			if(!current.eliminated(player)) {
+			        				act = Action.playGuard(myIndex, player, card);
+			        			}
+			        		}
+			        	}
+			        	else {
+			        		act = Action.playGuard(myIndex, guardTarget, Card.values()[guess(current)]);
+			        	}
 			        	break;
 		            case PRIEST:
 		            	act = Action.playPriest(myIndex, target);
+		            	seeOpponentsCard(target, current);
 		            	break;
-		            case BARON:  
-		            	act = Action.playBaron(myIndex, target);
+		            case BARON:
+		            	int minScore = 99999999;
+		            	int minPlayer = -1;
+		            	if(seenCards.size() > 0) {
+		            		for(int player: seenCards.keySet()) {
+		            			Card card = seenCards.get(player);
+		            			int cardValue = card.value();
+		            			if(cardValue < minScore) {
+		            				minScore = cardValue;
+		            				minPlayer = player;
+		            			}
+		            			act = Action.playBaron(myIndex, minPlayer);
+		            		}
+		            	}
+		            	else {
+		            		act = Action.playBaron(myIndex, target);
+		            	}
 		            	break;		          
 		            case HANDMAID:
 		            	act = Action.playHandmaid(myIndex);
@@ -157,27 +188,39 @@ public class simpleReflex implements Agent{
 	  return act;
 	}
   
-  
+  // WARNING !!!!! 
+  // THIS METHOD DOESNT CURRENTLY WORK. SOME ITERATIONS WILL FAIL
   // returns playerIndex of target player to try and eliminate
-  public int topScorer(State current) {
+  public int topScorer(State current) throws IllegalActionException {
 	  int playerCount = current.numPlayers();
 	  int maxScore = -1;
-	  int maxPlayer = -1;
+	  int maxPlayer = 0;
 	  
-	  for(int i=0; i<= playerCount-1; i++) {
-		  if(current.score(i) > maxScore) {
-			  if(i == myIndex) {
-				  continue;
+	  for(int i=0; i<playerCount; i++) {
+		  if(myIndex == i) {
+			  // can't target yourself
+			  continue;
+		  }
+		  else {
+			  int score = current.score(i);
+			  
+			  if(!current.eliminated(i)) {
+				  if((score >= maxScore) && (score >=2)) {
+					  maxPlayer = i;
+					  maxScore = score;
+				  }
 			  }
-			  maxScore = current.score(i);
-			  maxPlayer = i;
+		  }
+		  if(i==3) {
+			  break;
 		  }
 	  }
-	  
-	  if(maxScore == 0) {
+	  if(maxPlayer >= 2) {
+		  return maxPlayer;
+	  }
+	  else {
 		  return rand.nextInt(current.numPlayers());
 	  }
-	  return maxPlayer;
   }
   
   
@@ -190,28 +233,35 @@ public class simpleReflex implements Agent{
 		  try {
 			  switch(card.value()) {
 			    case 1:
-			    	continue;
+			    	break;
 			  	//priest
 			  	case 2:
 			  		deck[1] = deck[1] + 1;
+			  		break;
 			  	//baron
 			  	case 3:
 			  		deck[2] = deck[2] + 1;
+			  		break;
 			  	//hand-maid
 			  	case 4:
 			  		deck[3] = deck[3] + 1;
+			  		break;
 			  	//prince
 			  	case 5:
 			  		deck[4] = deck[4] + 1;
+			  		break;
 			  	//king
 			  	case 6:
 			  		deck[5] = deck[5] + 1;
+			  		break;
 			  	//countess
 			  	case 7:
 			  		deck[6] = deck[6] + 1;
+			  		break;
 			  	// princess
 			  	case 8:
 			  		deck[7] = deck[7] + 1;
+			  		break;
 			  }
 			  
 		  }catch(Exception e){/*do nothing, just try again*/} 
@@ -228,6 +278,35 @@ public class simpleReflex implements Agent{
 	  return largest;
   }
   
+  
+  
+  public void seeOpponentsCard(int target, State current) {
+	  Card card = current.getCard(target);
+	  if (card != null) {
+		  seenCards.put(target, card);  
+	  }
+  }
+  
+  
+  // DOESNT WORK PROPERLY
+  /**
+  public int getTarget(State current) {
+	  System.out.println("ok");
+	  int target = rand.nextInt(current.numPlayers());
+	  boolean foundTarget = false;
+	  
+	  while(!foundTarget) {
+		  if(current.getCard(target) == null) {
+			  continue;
+		  }else {
+			  target = rand.nextInt(current.numPlayers());
+			  foundTarget = true;
+		  }
+	  }
+	  System.out.println("ok!!!!");
+	  return target;
+  }
+  */
   
 }
 
