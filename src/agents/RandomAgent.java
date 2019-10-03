@@ -50,6 +50,7 @@ public class RandomAgent implements Agent{
   public Action playCard(Card c){
     Action act = null;
     Card play;
+    
     while(!current.legalAction(act, c)){
       if(rand.nextDouble()<0.5) play= c;
       else play = current.getCard(myIndex);
