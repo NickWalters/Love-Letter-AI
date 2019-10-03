@@ -142,9 +142,6 @@ public class simpleReflex implements Agent{
 			  else {
 				  if(!current.eliminated(r)) {
 					  if(countessPlayed(current, r)) {
-						  System.out.println("COUNTESS STATEMENT _____________________________________________");
-						  System.out.println("COUNTESS STATEMENT _____________________________________________");
-						  System.out.println("COUNTESS STATEMENT _____________________________________________");
 						  guardTarget = r;
 						  targetFoundAlready = true;
 						  break;
@@ -163,22 +160,20 @@ public class simpleReflex implements Agent{
 			        		// guess prince (or King)
 			        		act = Action.playGuard(myIndex, guardTarget, Card.values()[4]);
 			        		break;
-			        	}		
+			        	}
 			        	else {
 			        		guardTarget = rand.nextInt(current.numPlayers());
-			        		System.out.println("_-_-_-_-_-_-_-_-_-_-_-_-_-GUESS: " + guess(current));
 			        		act = Action.playGuard(myIndex, guardTarget, Card.values()[guess(current)]);
 			        		break;
 			        	}
 		            case PRIEST:
-		            	System.out.println("attempt to play priest");
 		            	act = Action.playPriest(myIndex, target);
 		            	// store the new result in a hashMap, so we can use it later. Important !
 		            	seeOpponentsCard(target, current);
 		            	break;
 		            case BARON:
 		            	act = Action.playBaron(myIndex, target);
-		            	break;          
+		            	break;            
 		            case HANDMAID:
 		            	act = Action.playHandmaid(myIndex);
 		            	break;
@@ -198,6 +193,11 @@ public class simpleReflex implements Agent{
 	  	}
 	  return act;
 	}
+  
+  
+  
+  
+  
   
   // WARNING !!!!! 
   // THIS METHOD DOESNT CURRENTLY WORK. SOME ITERATIONS WILL FAIL
@@ -227,6 +227,11 @@ public class simpleReflex implements Agent{
 	  System.out.println("finished topScorer()" + maxPlayer);
 	  topScorer = maxPlayer;
   }
+  
+  
+  
+  
+  
   
   
   // returns a guess for the guard. the guess is in the form of a Card
@@ -280,7 +285,6 @@ public class simpleReflex implements Agent{
 	  {
 	      if ( deck[i] >= deck[largest] ) largest = i;
 	  }
-	  System.out.println(Arrays.toString(deck));
 	  return largest;
   }
   
