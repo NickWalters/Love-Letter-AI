@@ -1,9 +1,7 @@
 package agents;
 import loveletter.*;
-import java.util.Random;
-// import java.util.*;
-import agents.Tree;
-import agents.Node;
+
+import java.util.*;
 
 /**
  * An interface for representing an agent in the game Love Letter
@@ -56,31 +54,42 @@ public class MCTS_Agent implements Agent{
   
   
   
-  public void MCTS() {
-	  // 1: create game environment, create agents/players
-	  // 2: call playGame(agents)
-	  // 3: playGame(agents) calls the methods of this class, such as newRound(), see()
-	  // 4: while round is not over, call drawCard() and playCard() until round is finished.
-	  
-	  
-	  
+  public Node MCTS(Node root) {
+	   int maxIterations = 9000;
+	   int i=0;
+	   while(i != maxIterations) {
+		   Node leaf = traverse(root); // selection and expansion
+		  	int simulation_result = rollout(leaf); // simulation
+		  	backpropagate(leaf, simulation_result); // back-propagate
+		  	i++;
+		  	return bestChild(root);
+	   }
+	  return null;
   }
   
   
   
-  public Action findNextMove(State state) {
-	  current = board;
-	  myIndex = current.getPlayerIndex();
-	  
-	  Tree tree = new Tree();
-	  Node rootNode = tree.getRoot();
-	  rootNode.setState(state);
-	  rootNode.setParent(myIndex);
-	  
+  private Node traverse(Node node) {
 	  
 	  return null;
   }
   
+  
+  private int rollout(Node node) {
+	  return -1;
+  }
+  
+  private Node rolloutPolicy(Node node) {
+	  return null;
+  }
+  
+  private void backpropagate(Node node, int result) {
+	  
+  }
+  
+  private Node bestChild(Node node) {
+	  return null;
+  }
   
   // this is the randomAgent example
   public Action playCard(Card c){
@@ -120,5 +129,53 @@ public class MCTS_Agent implements Agent{
     }
     return act;
   }
+  
+  
+  
+  // node data structure
+  private static class Node {
+	  State state;
+	  Node parent;
+	  List<Node> childArray;
+	  
+	  
+	  // setters and getters
+	  public State getState(){
+	    return state;
+	  }
+	  
+	  public Node getParent(){
+	    return parent;
+	  }
+	  
+	  public void setParent(Node parent){
+	    this.parent = parent;
+	  }
+	  
+	  public void setState(State state){
+	    this.state = state;
+	  }
+	}
+  
+  
+  
+  	// graph data structure
+  private static class Graph 
+  { 
+      int value; 
+      LinkedList<Integer> adjListArray[]; 
+        
+      // constructor  
+      Graph(int value) 
+      { 
+          this.value = value; 
+          adjListArray = new LinkedList[value]; 
+             
+          for(int i = 0; i < value ; i++){ 
+              adjListArray[i] = new LinkedList<>(); 
+          } 
+      } 
+  }
+  
 }
 
