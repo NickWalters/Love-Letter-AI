@@ -64,6 +64,8 @@ public class MCTS_Agent implements Agent{
 		    int simulation_result = rollout(leaf); // simulation
 		  	backpropagate(leaf, simulation_result); // back-propagate
 		  	i++;
+		  	// MCTS(bestChild(root))
+		  	// may need recursion, I don't know
 		  	return bestChild(root);
 	   }
 	  return null;
@@ -115,8 +117,7 @@ public class MCTS_Agent implements Agent{
 		  UCB1 = Double.POSITIVE_INFINITY;
 	  }
 	  else {
-		  Double d = new Double(sqrt(largeN/n));
-		  double UCB1 = v + c*(sqrt(bigN/n));
+		  UCB1 = v + c*(Math.sqrt(bigN/n));
 	  }	
 	  return UCB1;
   }

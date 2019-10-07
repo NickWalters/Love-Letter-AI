@@ -80,6 +80,7 @@ public class simpleReflex implements Agent{
 		  
 		  // this checks if you have a countess needing to be played
 		  if((handCard == 7 || drawnCard == 7)) {
+            // king
 		        if(handCard == 6 || drawnCard == 6) {
 		          if(drawnCard == 7) {
 		        	  play = c;
@@ -90,6 +91,7 @@ public class simpleReflex implements Agent{
 		        	  alreadyDecided = true;
 		          }
 		        }
+            // prince
 		        if(handCard == 5 || drawnCard == 5) {
 		          if(drawnCard == 7) {
 		        	  play = c;
@@ -101,6 +103,11 @@ public class simpleReflex implements Agent{
 		          }
 		        }
 		      }
+		  
+		  if((c == Card.PRINCE || current.getCard(myIndex) == Card.PRINCE) && (current.getCard(myIndex) != Card.COUNTESS || c != Card.COUNTESS)) {
+	          if(c == Card.PRINCE) play = c;
+	          else play = current.getCard(myIndex);
+	      }
 		  
 		  // this checks if you can play a hand maid!
 		  if((handCard == 4) || (drawnCard == 4) && alreadyDecided == false) {
@@ -150,7 +157,7 @@ public class simpleReflex implements Agent{
 			  }
 		  }
 		  
-		  // int target = topScorer(current, myIndex);
+		  // int target = topScorer(current);
 		  int target = rand.nextInt(current.numPlayers());
 		  try {
 			  // System.out.println("I will play a: " + play.toString());
@@ -199,37 +206,7 @@ public class simpleReflex implements Agent{
   
   
   
-  // WARNING !!!!! 
-  // THIS METHOD DOESNT CURRENTLY WORK. SOME ITERATIONS WILL FAIL
-  // returns playerIndex of target player to try and eliminate
-  public void topScorer(State current, int myNumber){
-	  System.out.println("running topScorer()");
-	  int playerCount = current.numPlayers();
-	  int maxScore = -1;
-	  int maxPlayer = 0;
-	  
-	  for(int i=0; i<playerCount; i++) {
-		  if(myNumber == i) {
-			  // can't target yourself
-			  continue;
-		  }
-		  else {
-			  int score = current.score(i);
-			  
-			  if(!current.eliminated(i)) {
-				  if(score >= maxScore) {
-					  maxPlayer = i;
-					  maxScore = score;
-				  }
-			  }
-		  }
-	  }
-	  System.out.println("finished topScorer()" + maxPlayer);
-	  topScorer = maxPlayer;
-  }
-  
-  
-  
+
   
   
   
@@ -285,6 +262,7 @@ public class simpleReflex implements Agent{
 	  {
 	      if ( deck[i] >= deck[largest] ) largest = i;
 	  }
+	  System.out.println(Arrays.toString(deck));
 	  return largest;
   }
   
