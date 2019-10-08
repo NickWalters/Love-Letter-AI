@@ -165,24 +165,28 @@ public class simpleReflex implements Agent{
 				  }
 			  }
 		  }
+		  int target = rand.nextInt(current.numPlayers());
 		  if(allUnableToEliminate(current)) {
 			  Card hCard = current.getCard(myIndex);
 			  Card dCard = c;
 			  // play the prince on yourself
 			  if(hCard.value() == 5) {
 				  play = current.getCard(myIndex);
+				  target = myIndex;
 			  }
 			  else if(dCard.value() == 5) {
 				  play = c;
+				  target = myIndex;
 			  }
 			  else {
 				  // can't do anything
 				  play = null;
 			  }
 		  }
-		  int target = getHighestPlayer(current, myIndex);
-		  // int target = rand.nextInt(current.numPlayers());
-		  
+		  else {
+			  target = getHighestPlayer(current, myIndex);
+		  }	
+		  // int target = rand.nextInt(current.numPlayers());	  
 		  try {
 			  // System.out.println("I will play a: " + play.toString());
 			  switch(play) {
@@ -286,7 +290,6 @@ public class simpleReflex implements Agent{
 	  {
 	      if ( deck[i] >= deck[largest] ) largest = i;
 	  }
-	  System.out.println(Arrays.toString(deck));
 	  return largest;
   }
   
