@@ -60,6 +60,30 @@ public class simpleReflex implements Agent{
   
   
 
+  /*
+   * TO DO __________
+   * 
+   * CHECK IF THE OTHER PLAYERS ARE PROTECTED BY THE HANDMAID, if they are then you can't do any moves on them
+   * 
+   * player 1:Handmaid
+	player 2:null
+	player 3:Prince
+	Player 3 draws the Handmaid
+	Player simpleReflexAgent(3) played the Handmaid.
+	Cards are:
+	player 0:null
+	player 1:Handmaid
+	player 2:null
+	player 3:Prince
+	Player 1 draws the Guard
+	Player Rando(1) played the Handmaid.
+	Cards are:
+	player 0:null
+	player 1:Guard
+	player 2:null
+	player 3:Prince
+	Player 3 draws the King
+   */
   
 
   
@@ -104,22 +128,6 @@ public class simpleReflex implements Agent{
 		        }
 		      }
 		  
-		  if((c == Card.PRINCE || current.getCard(myIndex) == Card.PRINCE) && (current.getCard(myIndex) != Card.COUNTESS || c != Card.COUNTESS)) {
-	          if(c == Card.PRINCE) play = c;
-	          else play = current.getCard(myIndex);
-	      }
-		  
-		  // this checks if you can play a hand maid!
-		  if((handCard == 4) || (drawnCard == 4) && alreadyDecided == false) {
-			  if(drawnCard == 4) {
-				  play = c;
-				  alreadyDecided = true;
-			  }
-			  else {
-				  play = current.getCard(myIndex);
-				  alreadyDecided = true;
-			  }
-		  }
 		  
 		  // if you have a princess, play the other lower value card.
 		  if((handCard ==8) || (drawnCard==8)) {
@@ -130,7 +138,8 @@ public class simpleReflex implements Agent{
 				  play = current.getCard(myIndex);
 			  }
 		  }
-		  else if (alreadyDecided == false) {
+		  
+		  if (alreadyDecided == false) {
 			  if(handCard <= drawnCard) {
 				  play = current.getCard(myIndex);
 			  }else {
@@ -156,9 +165,24 @@ public class simpleReflex implements Agent{
 				  }
 			  }
 		  }
+		  if(allUnableToEliminate(current)) {
+			  Card hCard = current.getCard(myIndex);
+			  Card dCard = c;
+			  // play the prince on yourself
+			  if(hCard.value() == 5) {
+				  play = current.getCard(myIndex);
+			  }
+			  else if(dCard.value() == 5) {
+				  play = c;
+			  }
+			  else {
+				  // can't do anything
+				  play = null;
+			  }
+		  }
+		  int target = getHighestPlayer(current, myIndex);
+		  // int target = rand.nextInt(current.numPlayers());
 		  
-		  // int target = topScorer(current);
-		  int target = rand.nextInt(current.numPlayers());
 		  try {
 			  // System.out.println("I will play a: " + play.toString());
 			  switch(play) {
@@ -300,7 +324,51 @@ public class simpleReflex implements Agent{
   }
   
   
+  public int getHighestPlayer(State state, int myIndex) {
+	  int players = state.numPlayers();
+	  HashMap<Integer, Integer> hashMap = new HashMap<>();
+	  int key = 0;
+	  int count = 0;
+	  
+	  for(int i=0; i<players; i++) {
+		  if(i != myIndex && !state.eliminated(i) && !state.handmaid(i)) {
+			  count++;
+			  hashMap.put(i, state.score(i));
+			  key = i;
+		     }
+	      }
+		  // protected by hand-maid, so do other statement
+		  if(count == 0) {
+			  return rand.nextInt(current.numPlayers());
+		  }
+	  
+	      int maxValueInMap=(Collections.max(hashMap.values()));
+	      for(Map.Entry<Integer, Integer> entry: hashMap.entrySet()){
+	    	  if(entry.getValue() == maxValueInMap) {
+	    		  key = entry.getKey();
+	    	  }
+	      }
+	  return key;
+  }
   
+  
+  public boolean allUnableToEliminate(State current) {
+	  int numPlayers = current.numPlayers();
+	  int count = 0;
+	  
+	  for(int i=0; i<numPlayers; i++) {
+		  if(!current.eliminated(i) || !current.handmaid(i)) {
+			  count++;
+		  }
+	  }
+	  // if all the players are eliminated or hand-maiden
+	  if(count == 0) {
+		  return true;
+	  }
+	  else {
+		  return false;
+	  }
+  }
   
   // DOESNT WORK PROPERLY
   /**
