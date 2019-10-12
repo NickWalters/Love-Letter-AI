@@ -2,22 +2,22 @@ package agents;
 import loveletter.*;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * An interface for representing an agent in the game Love Letter
  * All agent's must have a 0 parameter constructor
  * */
 
-// @author Nicholas Walters
+// @author 22243339
 
 public class simpleReflex implements Agent{
 
   private Random rand;
   private State current;
   private int myIndex;
-
-  HashMap<Integer, Card> seenCards = new HashMap<Integer, Card>();
   int topScorer;
+  int[] playedCard = {0, 0, 0, 0, 0, 0, 0, 0};
   
   //0 place default constructor
   public simpleReflex(){
@@ -41,7 +41,13 @@ public class simpleReflex implements Agent{
   public void newRound(State start){
     current = start;
     myIndex = current.getPlayerIndex();
-    seenCards.clear();
+    
+    //initial playedCard for each round
+    for(int i=0; i < 8; i++ ) {
+    	playedCard[i] = 0;
+    	
+    }
+    
   }
 
   
@@ -56,12 +62,32 @@ public class simpleReflex implements Agent{
    * **/
   public void see(Action act, State results){
     current = results;
+	if(act.card().value() == 1) {
+		playedCard[0] += 1;
+	}else if(act.card().value() == 2){
+		playedCard[1] += 1;
+	}else if(act.card().value() == 3){
+		playedCard[2] += 1;
+	}else if(act.card().value() == 4){
+		playedCard[3] += 1;
+	}else if(act.card().value() == 5){
+		playedCard[4] += 1;
+	}else if(act.card().value() == 6){
+		playedCard[5] += 1;
+	}else if(act.card().value() == 7){
+		playedCard[6] += 1;
+	}else if(act.card().value() == 8){
+		playedCard[7] += 1;
+	}
+//    System.out.println("================PLAYEDCARD===========");
+//    System.out.println(Arrays.toString(playedCard));
+//    System.out.println("================PLAYEDCARD===========");
+
+	
   }
   
   
-
   
-
   
   /**
    * Perform an action after drawing a card from the deck
@@ -75,11 +101,15 @@ public class simpleReflex implements Agent{
 	  int drawnCard = c.value();
 	  int handCard = current.getCard(myIndex).value();
 	  boolean alreadyDecided = false;
+	  TreeMap<Integer,Integer> knownCards = new TreeMap<>();
+	  fillKnownCards(current,myIndex, knownCards);
+	  int target = rand.nextInt(current.numPlayers());
 	  
 	  while(!current.legalAction(act, c)) {
 		  
 		  // this checks if you have a countess needing to be played
 		  if((handCard == 7 || drawnCard == 7)) {
+            // king
 		        if(handCard == 6 || drawnCard == 6) {
 		          if(drawnCard == 7) {
 		        	  play = c;
@@ -90,6 +120,7 @@ public class simpleReflex implements Agent{
 		        	  alreadyDecided = true;
 		          }
 		        }
+            // prince
 		        if(handCard == 5 || drawnCard == 5) {
 		          if(drawnCard == 7) {
 		        	  play = c;
@@ -102,9 +133,10 @@ public class simpleReflex implements Agent{
 		        }
 		      }
 		  
-		  // this checks if you can play a hand maid!
-		  if((handCard == 4) || (drawnCard == 4) && alreadyDecided == false) {
-			  if(drawnCard == 4) {
+		  
+		  // if you have a princess, play the other lower value card.
+		  if((handCard ==8) || (drawnCard==8)) {
+			  if(handCard == 8) {
 				  play = c;
 				  alreadyDecided = true;
 			  }
@@ -114,16 +146,7 @@ public class simpleReflex implements Agent{
 			  }
 		  }
 		  
-		  // if you have a princess, play the other lower value card.
-		  if((handCard ==8) || (drawnCard==8)) {
-			  if(handCard == 8) {
-				  play = c;
-			  }
-			  else {
-				  play = current.getCard(myIndex);
-			  }
-		  }
-		  else if (alreadyDecided == false) {
+		  if (alreadyDecided == false) {
 			  if(handCard <= drawnCard) {
 				  play = current.getCard(myIndex);
 			  }else {
@@ -131,10 +154,10 @@ public class simpleReflex implements Agent{
 			  }
 		  }
 		  
-
 		  // check if a player has played a countess recently
 		  boolean targetFoundAlready = false; // only use with guard
-		  int guardTarget = rand.nextInt(current.numPlayers());		
+		  int guardTarget = rand.nextInt(current.numPlayers());
+		  
 		  for(int r=0; r<current.numPlayers(); r++) {
 			  if(r == myIndex) {
 				  continue;
@@ -150,26 +173,50 @@ public class simpleReflex implements Agent{
 			  }
 		  }
 		  
-		  // int target = topScorer(current, myIndex);
-		  int target = rand.nextInt(current.numPlayers());
+		  if(allUnableToEliminate(current)) {
+			  Card hCard = current.getCard(myIndex);
+			  Card dCard = c;
+			  // play the prince on yourself
+			  if(hCard.value() == 5) {
+				  play = current.getCard(myIndex);
+				  target = myIndex;
+			  }
+			  else if(dCard.value() == 5) {
+				  play = c;
+				  target = myIndex;
+			  }
+			  else {
+				  // can't do anything
+				  play = null;
+			  }
+		  }
+		  else {
+			  target = getHighestPlayer(current, myIndex);
+		  }	
+		  // int target = rand.nextInt(current.numPlayers());	  
 		  try {
 			  // System.out.println("I will play a: " + play.toString());
 			  switch(play) {
 			        case GUARD:
 			        	if(targetFoundAlready) {
+			        		//check if all Prince has been played
+			        		if(playedCard[4] !=2) {
+			        		System.out.println("target found it!!!!!!!!!!!!!!" + act);
 			        		// guess prince (or King)
 			        		act = Action.playGuard(myIndex, guardTarget, Card.values()[4]);
+			        		}
 			        		break;
 			        	}
 			        	else {
 			        		guardTarget = rand.nextInt(current.numPlayers());
 			        		act = Action.playGuard(myIndex, guardTarget, Card.values()[guess(current)]);
+//			        		System.out.println("Agent trying to guess--------->" + act);
 			        		break;
 			        	}
 		            case PRIEST:
 		            	act = Action.playPriest(myIndex, target);
-		            	// store the new result in a hashMap, so we can use it later. Important !
-		            	seeOpponentsCard(target, current);
+		            	System.out.println("PLAYED PRIEST ________________________________________________________________________");
+		            	System.out.println("PLAYED PRIEST ________________________________________________________________________");
 		            	break;
 		            case BARON:
 		            	act = Action.playBaron(myIndex, target);
@@ -199,37 +246,7 @@ public class simpleReflex implements Agent{
   
   
   
-  // WARNING !!!!! 
-  // THIS METHOD DOESNT CURRENTLY WORK. SOME ITERATIONS WILL FAIL
-  // returns playerIndex of target player to try and eliminate
-  public void topScorer(State current, int myNumber){
-	  System.out.println("running topScorer()");
-	  int playerCount = current.numPlayers();
-	  int maxScore = -1;
-	  int maxPlayer = 0;
-	  
-	  for(int i=0; i<playerCount; i++) {
-		  if(myNumber == i) {
-			  // can't target yourself
-			  continue;
-		  }
-		  else {
-			  int score = current.score(i);
-			  
-			  if(!current.eliminated(i)) {
-				  if(score >= maxScore) {
-					  maxPlayer = i;
-					  maxScore = score;
-				  }
-			  }
-		  }
-	  }
-	  System.out.println("finished topScorer()" + maxPlayer);
-	  topScorer = maxPlayer;
-  }
-  
-  
-  
+
   
   
   
@@ -238,7 +255,6 @@ public class simpleReflex implements Agent{
   public int guess(State current) {
 	  Card[] unseenCards = current.unseenCards();
 	  int[] deck = {0,0,0,0,0,0,0,0};
-	  
 	  for(Card card: unseenCards){
 		  try {
 			  switch(card.value()) {
@@ -285,17 +301,12 @@ public class simpleReflex implements Agent{
 	  {
 	      if ( deck[i] >= deck[largest] ) largest = i;
 	  }
+//	  System.out.println("unseen card in table");
+//	  System.out.println(Arrays.toString(deck));
 	  return largest;
   }
   
   
-  
-  public void seeOpponentsCard(int target, State current) {
-	  Card card = current.getCard(target);
-	  if (card != null) {
-		  seenCards.put(target, card);  
-	  }
-  }
   
   
   // check to determine if the target opponent has played a countess last turn. returns true if yes
@@ -322,31 +333,61 @@ public class simpleReflex implements Agent{
   }
   
   
-  
-  
-  // DOESNT WORK PROPERLY
-  /**
-  public int getTarget(State current) {
-	  System.out.println("ok");
-	  int target = rand.nextInt(current.numPlayers());
-	  boolean foundTarget = false;
+  public int getHighestPlayer(State state, int myIndex) {
+	  int players = state.numPlayers();
+	  HashMap<Integer, Integer> hashMap = new HashMap<>();
+	  int key = 0;
+	  int count = 0;
 	  
-	  while(!foundTarget) {
-		  if(current.getCard(target) == null) {
-			  continue;
-		  }else {
-			  target = rand.nextInt(current.numPlayers());
-			  foundTarget = true;
+	  for(int i=0; i<players; i++) {
+		  if(i != myIndex && !state.eliminated(i) && !state.handmaid(i)) {
+			  count++;
+			  hashMap.put(i, state.score(i));
+			  key = i;
+		     }
+	      }
+		  // protected by hand-maid, so do other statement
+		  if(count == 0) {
+			  return rand.nextInt(current.numPlayers());
+		  }
+	  
+	      int maxValueInMap=(Collections.max(hashMap.values()));
+	      for(Map.Entry<Integer, Integer> entry: hashMap.entrySet()){
+	    	  if(entry.getValue() == maxValueInMap) {
+	    		  key = entry.getKey();
+	    	  }
+	      }
+	  return key;
+  }
+  
+  
+  public boolean allUnableToEliminate(State current) {
+	  int numPlayers = current.numPlayers();
+	  int count = 0;
+	  
+	  for(int i=0; i<numPlayers; i++) {
+		  if(!current.eliminated(i) || !current.handmaid(i)) {
+			  count++;
 		  }
 	  }
-	  System.out.println("ok!!!!");
-	  return target;
+	  // if all the players are eliminated or hand-maiden
+	  if(count == 0) {
+		  return true;
+	  }
+	  else {
+		  return false;
+	  }
   }
-  */
+  
+  
+  private void fillKnownCards(State state, int myIndex, TreeMap<Integer,Integer> knownCards){
+      for(int i=0;i<state.numPlayers();i++){
+          if(i == myIndex) continue;
+          Card card = state.getCard(i);
+          if(card != null){
+              knownCards.put(i,state.getCard(i).value());
+          }
+      }
+  }
   
 }
-
-
-
-
-
