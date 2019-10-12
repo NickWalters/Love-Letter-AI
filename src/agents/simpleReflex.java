@@ -185,8 +185,7 @@ public class simpleReflex implements Agent{
 		  }
 		  else {
 			  target = getHighestPlayer(current, myIndex);
-		  }	
-		  // int target = rand.nextInt(current.numPlayers());	  
+		  }	  
 		  try {
 			  // System.out.println("I will play a: " + play.toString());
 			  switch(play) {
@@ -357,15 +356,17 @@ public class simpleReflex implements Agent{
   
   public boolean allUnableToEliminate(State current) {
 	  int numPlayers = current.numPlayers();
-	  int count = 0;
+	  int canTarget = 0;
 	  
 	  for(int i=0; i<numPlayers; i++) {
-		  if(!current.eliminated(i) || !current.handmaid(i)) {
-			  count++;
+		  if((!current.eliminated(i)) || (!current.handmaid(i))) {
+			  if(i != myIndex) {
+				  canTarget++;
+			  }
 		  }
 	  }
 	  // if all the players are eliminated or hand-maiden
-	  if(count == 0) {
+	  if(canTarget == 0) {
 		  return true;
 	  }
 	  else {
