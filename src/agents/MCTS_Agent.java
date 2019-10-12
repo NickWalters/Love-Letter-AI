@@ -1,6 +1,6 @@
 package agents;
 import loveletter.*;
-
+import java.lang.Math;
 import java.util.*;
 
 /**
@@ -12,6 +12,7 @@ public class MCTS_Agent implements Agent{
   private Random rand;
   private State current;
   private int myIndex;
+  int bigN = 0;
   
 
 
@@ -55,40 +56,90 @@ public class MCTS_Agent implements Agent{
   
   
   public Node MCTS(Node root) {
+	  
 	   int maxIterations = 9000;
 	   int i=0;
 	   while(i != maxIterations) {
 		   Node leaf = traverse(root); // selection and expansion
-		  	int simulation_result = rollout(leaf); // simulation
+		    int simulation_result = rollout(leaf); // simulation
 		  	backpropagate(leaf, simulation_result); // back-propagate
 		  	i++;
+		  	// MCTS(bestChild(root))
+		  	// may need recursion, I don't know
 		  	return bestChild(root);
 	   }
 	  return null;
   }
   
   
-  
+  // give the parent node of the Node to traverse, and search all of its children
+  //@return return the best UCB1 value
   private Node traverse(Node node) {
 	  
-	  return null;
+	  ArrayList<Node> children = node.getChildren();
+	  Node maxChild = null;
+	  double maxUCB1 = -1;
+	  
+	  // for each child, check the UCB1 value, and select the highest value (of the leaf nodes/children)
+	  for(Node child: children) {
+		  double UCB1 = UCB1(child);
+		  if(UCB1 >= maxUCB1) {
+			  maxUCB1 = UCB1;
+			  maxChild = child;
+		  }
+	  }
+	  return maxChild;
   }
   
   
   private int rollout(Node node) {
+	  
+	  ArrayList<Node> children = node.getChildren();
+	  boolean iteration = true;
+	  int i=0;
+	  while(iteration) {
+		  if( children.size() == i ) {
+			  return value(children.get(i));
+		  }else {
+//			  Math.random();
+		  }
+		  i++;
+	  }
 	  return -1;
   }
   
-  private Node rolloutPolicy(Node node) {
-	  return null;
-  }
-  
-  private void backpropagate(Node node, int result) {
-	  
+  private int value(Node node) {
+	// TODO Auto-generated method stub
+	return 0;
+}
+
+private void backpropagate(Node node, int result) {
+	  //each time increase the number of total simulations
+	  bigN++;
+	  //update parent's T 
+	  int a = node.t;
+	  a += result;
+	  node.setT(a);
   }
   
   private Node bestChild(Node node) {
 	  return null;
+  }
+  
+  //if the node haven't expanded then set it to infinity otherwise calculate the value
+  private double UCB1(Node node) { 
+	  int v = node.getT();
+	  double c = 2;
+	  int n = node.getN();
+	  double UCB1 = 0;
+	  
+	  if((v == 0) & (n==0)) {
+		  UCB1 = Double.POSITIVE_INFINITY;
+	  }
+	  else {
+		  UCB1 = v + c*(Math.sqrt(Math.log(bigN) /n));
+	  }	
+	  return UCB1;
   }
   
   // this is the randomAgent example
@@ -133,10 +184,12 @@ public class MCTS_Agent implements Agent{
   
   
   // node data structure
-  private static class Node {
+  private static class Node {  
 	  State state;
 	  Node parent;
-	  List<Node> childArray;
+	  int t; // the total score. this is updated during back-propagation
+	  int n; // the number of times this node has been visited. this is updated during back-propagation and traversal
+	  ArrayList<Node> childArray;
 	  
 	  
 	  // setters and getters
@@ -154,6 +207,29 @@ public class MCTS_Agent implements Agent{
 	  
 	  public void setState(State state){
 	    this.state = state;
+	  }
+	  
+	  public void addChild(Node child) {
+		  childArray.add(child);
+	  }
+	  
+	  public ArrayList<Node> getChildren() {
+		  return childArray;
+	  }
+	  
+	  public void setT(int t) {
+		  this.t = t;
+	  }
+	  
+	  public int getT() {
+		  return t;
+	  }
+	  public void incrementN() {
+		  n++;
+	  }
+	  
+	  public int getN(){
+		  return n;
 	  }
 	}
   
