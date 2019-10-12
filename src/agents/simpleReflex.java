@@ -259,12 +259,12 @@ public class simpleReflex implements Agent{
 	  int indexOfDeduction = current.getCard(myIndex).value()-1;
 	  deck[indexOfDeduction] = deck[indexOfDeduction] - 1;
 	  
-	  int largest = 0;
+	  int largestProbability = 0;
 	  for (int i=0; i<8; i++)
 	  {
-	      if ( deck[i] >= deck[largest] ) largest = i;
+	      if ( deck[i] >= deck[largestProbability] ) largestProbability = i;
 	  }
-	  return largest;
+	  return largestProbability;
   }
   
   
