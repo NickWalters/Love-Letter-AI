@@ -2,21 +2,20 @@ package agents;
 import loveletter.*;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * An interface for representing an agent in the game Love Letter
  * All agent's must have a 0 parameter constructor
  * */
 
-// @author Nicholas Walters
+// @author 22243339
 
 public class simpleReflex implements Agent{
 
   private Random rand;
   private State current;
   private int myIndex;
-
-  HashMap<Integer, Card> seenCards = new HashMap<Integer, Card>();
   int topScorer;
   
   //0 place default constructor
@@ -41,7 +40,6 @@ public class simpleReflex implements Agent{
   public void newRound(State start){
     current = start;
     myIndex = current.getPlayerIndex();
-    seenCards.clear();
   }
 
   
@@ -59,33 +57,7 @@ public class simpleReflex implements Agent{
   }
   
   
-
-  /*
-   * TO DO __________
-   * 
-   * CHECK IF THE OTHER PLAYERS ARE PROTECTED BY THE HANDMAID, if they are then you can't do any moves on them
-   * 
-   * player 1:Handmaid
-	player 2:null
-	player 3:Prince
-	Player 3 draws the Handmaid
-	Player simpleReflexAgent(3) played the Handmaid.
-	Cards are:
-	player 0:null
-	player 1:Handmaid
-	player 2:null
-	player 3:Prince
-	Player 1 draws the Guard
-	Player Rando(1) played the Handmaid.
-	Cards are:
-	player 0:null
-	player 1:Guard
-	player 2:null
-	player 3:Prince
-	Player 3 draws the King
-   */
   
-
   
   /**
    * Perform an action after drawing a card from the deck
@@ -99,6 +71,9 @@ public class simpleReflex implements Agent{
 	  int drawnCard = c.value();
 	  int handCard = current.getCard(myIndex).value();
 	  boolean alreadyDecided = false;
+	  TreeMap<Integer,Integer> knownCards = new TreeMap<>();
+	  fillKnownCards(current,myIndex, knownCards);
+	  int target = rand.nextInt(current.numPlayers());
 	  
 	  while(!current.legalAction(act, c)) {
 		  
@@ -133,9 +108,11 @@ public class simpleReflex implements Agent{
 		  if((handCard ==8) || (drawnCard==8)) {
 			  if(handCard == 8) {
 				  play = c;
+				  alreadyDecided = true;
 			  }
 			  else {
 				  play = current.getCard(myIndex);
+				  alreadyDecided = true;
 			  }
 		  }
 		  
@@ -165,7 +142,7 @@ public class simpleReflex implements Agent{
 				  }
 			  }
 		  }
-		  int target = rand.nextInt(current.numPlayers());
+		  
 		  if(allUnableToEliminate(current)) {
 			  Card hCard = current.getCard(myIndex);
 			  Card dCard = c;
@@ -202,8 +179,8 @@ public class simpleReflex implements Agent{
 			        	}
 		            case PRIEST:
 		            	act = Action.playPriest(myIndex, target);
-		            	// store the new result in a hashMap, so we can use it later. Important !
-		            	seeOpponentsCard(target, current);
+		            	System.out.println("PLAYED PRIEST ________________________________________________________________________");
+		            	System.out.println("PLAYED PRIEST ________________________________________________________________________");
 		            	break;
 		            case BARON:
 		            	act = Action.playBaron(myIndex, target);
@@ -294,13 +271,6 @@ public class simpleReflex implements Agent{
   
   
   
-  public void seeOpponentsCard(int target, State current) {
-	  Card card = current.getCard(target);
-	  if (card != null) {
-		  seenCards.put(target, card);  
-	  }
-  }
-  
   
   // check to determine if the target opponent has played a countess last turn. returns true if yes
   public boolean countessPlayed(State current, int player) {
@@ -374,25 +344,16 @@ public class simpleReflex implements Agent{
 	  }
   }
   
-  // DOESNT WORK PROPERLY
-  /**
-  public int getTarget(State current) {
-	  System.out.println("ok");
-	  int target = rand.nextInt(current.numPlayers());
-	  boolean foundTarget = false;
-	  
-	  while(!foundTarget) {
-		  if(current.getCard(target) == null) {
-			  continue;
-		  }else {
-			  target = rand.nextInt(current.numPlayers());
-			  foundTarget = true;
-		  }
-	  }
-	  System.out.println("ok!!!!");
-	  return target;
+  
+  private void fillKnownCards(State state, int myIndex, TreeMap<Integer,Integer> knownCards){
+      for(int i=0;i<state.numPlayers();i++){
+          if(i == myIndex) continue;
+          Card card = state.getCard(i);
+          if(card != null){
+              knownCards.put(i,state.getCard(i).value());
+          }
+      }
   }
-  */
   
 }
 
