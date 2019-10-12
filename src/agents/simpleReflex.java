@@ -115,7 +115,7 @@ public class simpleReflex implements Agent{
 				  alreadyDecided = true;
 			  }
 		  }
-		  
+		  // select the higher value card by default
 		  if (alreadyDecided == false) {
 			  if(handCard <= drawnCard) {
 				  play = current.getCard(myIndex);
@@ -142,7 +142,7 @@ public class simpleReflex implements Agent{
 				  }
 			  }
 		  }
-		  
+		  // target somebody, but also check if they are eliminated (or countess) first
 		  if(allUnableToEliminate(current)) {
 			  Card hCard = current.getCard(myIndex);
 			  Card dCard = c;
@@ -179,8 +179,6 @@ public class simpleReflex implements Agent{
 			        	}
 		            case PRIEST:
 		            	act = Action.playPriest(myIndex, target);
-		            	System.out.println("PLAYED PRIEST ________________________________________________________________________");
-		            	System.out.println("PLAYED PRIEST ________________________________________________________________________");
 		            	break;
 		            case BARON:
 		            	act = Action.playBaron(myIndex, target);
