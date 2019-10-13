@@ -138,13 +138,11 @@ public class simpleReflex implements Agent{
 		  
 		  
 		  // select the higher value card by default
-		  boolean handCardHigher = false;
 		  if (alreadyDecided == false) {
 			  if(handCard <= drawnCard) {
 				  play = current.getCard(myIndex);
 			  }else {
 				  play = c;
-				  handCardHigher = true;
 			  }
 			// if you have a baron, then playing this can be a Risk. Agent will Check if its OK
 			  if(play.value() == 3) {
@@ -161,17 +159,17 @@ public class simpleReflex implements Agent{
 		  
 		  
 		  // FINAL STEP
-		  // check if your target is eliminated (or countess)
+		  // check if your targets are eliminated (or countess)
 		  if(allUnableToEliminate(current)) {
 			  Card hCard = current.getCard(myIndex);
 			  Card dCard = c;
 			  // play the prince on yourself
 			  if(hCard.value() == 5) {
-				  play = current.getCard(myIndex);
+				  play = hCard;
 				  target = myIndex;
 			  }
 			  else if(dCard.value() == 5) {
-				  play = c;
+				  play = dCard;
 				  target = myIndex;
 			  }
 			  else {
@@ -197,7 +195,7 @@ public class simpleReflex implements Agent{
 			        	}
 			        	else {
 			        		guardTarget = rand.nextInt(current.numPlayers());
-			        		act = Action.playGuard(myIndex, guardTarget, Card.values()[guess(current)]);
+			        		act = Action.playGuard(myIndex, target, Card.values()[guess(current)]);
 			        		break;
 			        	}
 		            case PRIEST:
@@ -302,9 +300,7 @@ public class simpleReflex implements Agent{
   
   // check to determine if the target opponent has played a countess last turn. returns true if yes
   public boolean countessPlayed(State current, int player) {
-	  // System.out.println("countessPlayed()");
 	  Iterator<Card> it = current.getDiscards(player);
-	  // size of discard deck
 	  
 	  if(it == null) {
 		  return false;
