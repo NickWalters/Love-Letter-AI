@@ -189,7 +189,7 @@ public class simpleReflex implements Agent{
 			  switch(play) {
 			        case GUARD:
 			        	if(guardTargetFound) {
-			        		// guess prince (or King)
+			        		// person has played a countess, so likely has a king or prince
 			        		int[] thisDeck = unseenDeck(current);
 			        		if(thisDeck[4] >= thisDeck[5]) {
 			        			// guess prince
@@ -210,6 +210,17 @@ public class simpleReflex implements Agent{
 		            	act = Action.playPriest(myIndex, target);
 		            	break;
 		            case BARON:
+		            	// if we have used priest before
+	            		if(!knownCards.isEmpty()) {
+	            			for(Integer opponent : knownCards.descendingKeySet()){
+	            				if(!current.handmaid(opponent) && !current.eliminated(opponent) && opponent != myIndex){
+	            					int value = knownCards.get(opponent);
+	            					if(value > current.getCard(myIndex).value()) {
+	            						target = opponent;
+	            					}
+	            				}
+	            			}
+	            		}
 		            	act = Action.playBaron(myIndex, target);
 		            	break;            
 		            case HANDMAID:
@@ -221,10 +232,31 @@ public class simpleReflex implements Agent{
 		            		break;
 		            	}
 		            	else {
+		            		// if we have used priest before
+		            		if(!knownCards.isEmpty()) {
+		            			for(Integer opponent : knownCards.descendingKeySet()){
+		            				if(!current.handmaid(opponent) && !current.eliminated(opponent) && opponent != myIndex){
+		            					int value = knownCards.get(opponent);
+		            					if(value >= 6) {
+		            						target = opponent;
+		            					}
+		            				}
+		                    	}
+		            		}
 		            		act = Action.playPrince(myIndex, target);
 		            		break;
 		            	}
 		            case KING:
+		            	if(!knownCards.isEmpty()) {
+	            			for(Integer opponent : knownCards.descendingKeySet()){
+	            				if(!current.handmaid(opponent) && !current.eliminated(opponent) && opponent != myIndex){
+	            					int value = knownCards.get(opponent);
+	            					if(value > 6) {
+	            						target = opponent;
+	            					}
+	            				}
+	            			}
+		            	}
 		            	act = Action.playKing(myIndex, target);
 			            break;
 		            case COUNTESS:
