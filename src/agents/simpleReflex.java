@@ -75,6 +75,7 @@ public class simpleReflex implements Agent{
 	  fillKnownCards(current,myIndex, knownCards);
 	  int target = rand.nextInt(current.numPlayers());
 	  
+	  
 	  while(!current.legalAction(act, c)) {
 		  
 		  // this checks if you have a countess needing to be played
@@ -105,7 +106,7 @@ public class simpleReflex implements Agent{
 		  
 		  
 		  // if you have a princess, play the other lower value card.
-		  if((handCard ==8) || (drawnCard==8)) {
+		  else if((handCard ==8) || (drawnCard==8)) {
 			  if(handCard == 8) {
 				  play = c;
 				  alreadyDecided = true;
@@ -115,34 +116,52 @@ public class simpleReflex implements Agent{
 				  alreadyDecided = true;
 			  }
 		  }
-		  // select the higher value card by default
-		  if (alreadyDecided == false) {
-			  if(handCard <= drawnCard) {
-				  play = current.getCard(myIndex);
-			  }else {
-				  play = c;
-			  }
-		  }
 		  
-
+		  
 		  // check if a player has played a countess recently
-		  boolean targetFoundAlready = false; // only use with guard
+		  boolean guardTargetFound = false; // only use with guard
 		  int guardTarget = rand.nextInt(current.numPlayers());		
-		  for(int r=0; r<current.numPlayers(); r++) {
-			  if(r == myIndex) {
+		  for(int p=0; p<current.numPlayers(); p++) {
+			  if(p == myIndex) {
 				  continue;
 			  }
 			  else {
-				  if(!current.eliminated(r)) {
-					  if(countessPlayed(current, r)) {
-						  guardTarget = r;
-						  targetFoundAlready = true;
+				  if(!current.eliminated(p)) {
+					  if(countessPlayed(current, p)) {
+						  guardTarget = p;
+						  guardTargetFound = true;
 						  break;
 					  }
 				  }
 			  }
 		  }
-		  // target somebody, but also check if they are eliminated (or countess) first
+		  
+		  
+		  // select the higher value card by default
+		  boolean handCardHigher = false;
+		  if (alreadyDecided == false) {
+			  if(handCard <= drawnCard) {
+				  play = current.getCard(myIndex);
+			  }else {
+				  play = c;
+				  handCardHigher = true;
+			  }
+			// if you have a baron, then playing this can be a Risk. Agent will Check if its OK
+			  if(play.value() == 3) {
+				  if(playBaronOK(current, c) == false) {
+					  if(current.getCard(myIndex).value() == 3) {
+						  play = c;
+					  }
+					  if(c.value() == 3) {
+						  play = current.getCard(myIndex);
+					  }
+				  }
+			  }
+		  }
+		  
+		  
+		  // FINAL STEP
+		  // check if your target is eliminated (or countess)
 		  if(allUnableToEliminate(current)) {
 			  Card hCard = current.getCard(myIndex);
 			  Card dCard = c;
@@ -158,16 +177,20 @@ public class simpleReflex implements Agent{
 			  else {
 				  // can't do anything
 				  play = null;
+				  target = getHighestPlayer(current, myIndex);
 			  }
 		  }
 		  else {
 			  target = getHighestPlayer(current, myIndex);
-		  }	  
+		  }
+		  
+		  
+		  // TARGET and PLAY has been found, execute main statement
 		  try {
 			  // System.out.println("I will play a: " + play.toString());
 			  switch(play) {
 			        case GUARD:
-			        	if(targetFoundAlready) {
+			        	if(guardTargetFound) {
 			        		// guess prince (or King)
 			        		act = Action.playGuard(myIndex, guardTarget, Card.values()[4]);
 			        		break;
@@ -187,8 +210,14 @@ public class simpleReflex implements Agent{
 		            	act = Action.playHandmaid(myIndex);
 		            	break;
 		            case PRINCE:
-		            	act = Action.playPrince(myIndex, target);
-			            break;
+		            	if(allUnableToEliminate(current)) {
+		            		act = Action.playPrince(myIndex, myIndex);
+		            		break;
+		            	}
+		            	else {
+		            		act = Action.playPrince(myIndex, target);
+		            		break;
+		            	}
 		            case KING:
 		            	act = Action.playKing(myIndex, target);
 			            break;
@@ -352,6 +381,88 @@ public class simpleReflex implements Agent{
               knownCards.put(i,state.getCard(i).value());
           }
       }
+  }
+  
+  // calculates the probability of losing if you play the baron
+  // the agent will tolerate no more than a 40% chance of losing
+  private boolean playBaronOK(State current, Card c) {
+	  Card[] unseenCards = current.unseenCards();
+	  int[] deck = {0,0,0,0,0,0,0,0};
+	  int comparingCard = -1;
+	  
+	  if(current.getCard(myIndex).value() == 3) {
+		  comparingCard = c.value();
+	  }
+	  else{
+		  comparingCard = current.getCard(myIndex).value();
+	  }
+	  
+	  for(Card card: unseenCards){
+		  try {
+			  switch(card.value()) {
+			    case 1:
+			    	break;
+			  	//priest
+			  	case 2:
+			  		deck[1] = deck[1] + 1;
+			  		break;
+			  	//baron
+			  	case 3:
+			  		deck[2] = deck[2] + 1;
+			  		break;
+			  	//hand-maid
+			  	case 4:
+			  		deck[3] = deck[3] + 1;
+			  		break;
+			  	//prince
+			  	case 5:
+			  		deck[4] = deck[4] + 1;
+			  		break;
+			  	//king
+			  	case 6:
+			  		deck[5] = deck[5] + 1;
+			  		break;
+			  	//countess
+			  	case 7:
+			  		deck[6] = deck[6] + 1;
+			  		break;
+			  	// princess
+			  	case 8:
+			  		deck[7] = deck[7] + 1;
+			  		break;
+			  }
+			  
+		  }catch(Exception e){/*do nothing, just try again*/}	  
+	  }
+	  // minus the agents current hand
+	  int indexOfDeduction = current.getCard(myIndex).value()-1;
+	  deck[indexOfDeduction] = deck[indexOfDeduction] - 1;
+	  
+	  int unseenCount = 0;
+	  int countBelow = 0;
+	  int countAbove = 0;
+	  int i=0;
+	  for(int cardCount: deck) {
+		  // baron or less
+		  if(i+1<=comparingCard) {
+			  countBelow = countBelow + cardCount;
+			  unseenCount = unseenCount + cardCount;
+			  i++;
+		  }
+		  else {
+			  countAbove = countAbove + cardCount;
+			  unseenCount = unseenCount + cardCount;
+			  i++;
+		  }
+	  }
+	  float winProbability = (((float) countBelow) / unseenCount) * 100;
+	  
+	  if(winProbability > 60) {
+		  return true;
+	  }
+	  else {
+		  return false;
+	  }
   }
   
 }
