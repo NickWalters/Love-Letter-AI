@@ -115,7 +115,7 @@ public class simpleReflex implements Agent{
 				  alreadyDecided = true;
 			  }
 		  }
-		  
+		  // select the higher value card by default
 		  if (alreadyDecided == false) {
 			  if(handCard <= drawnCard) {
 				  play = current.getCard(myIndex);
@@ -142,7 +142,7 @@ public class simpleReflex implements Agent{
 				  }
 			  }
 		  }
-		  
+		  // target somebody, but also check if they are eliminated (or countess) first
 		  if(allUnableToEliminate(current)) {
 			  Card hCard = current.getCard(myIndex);
 			  Card dCard = c;
@@ -162,8 +162,7 @@ public class simpleReflex implements Agent{
 		  }
 		  else {
 			  target = getHighestPlayer(current, myIndex);
-		  }	
-		  // int target = rand.nextInt(current.numPlayers());	  
+		  }	  
 		  try {
 			  // System.out.println("I will play a: " + play.toString());
 			  switch(play) {
@@ -180,8 +179,6 @@ public class simpleReflex implements Agent{
 			        	}
 		            case PRIEST:
 		            	act = Action.playPriest(myIndex, target);
-		            	System.out.println("PLAYED PRIEST ________________________________________________________________________");
-		            	System.out.println("PLAYED PRIEST ________________________________________________________________________");
 		            	break;
 		            case BARON:
 		            	act = Action.playBaron(myIndex, target);
@@ -262,13 +259,13 @@ public class simpleReflex implements Agent{
 	  int indexOfDeduction = current.getCard(myIndex).value()-1;
 	  deck[indexOfDeduction] = deck[indexOfDeduction] - 1;
 	  
-	  int largest = 0;
+	  int largestProbability = 0;
 	  for (int i=0; i<8; i++)
 	  {
-	      if ( deck[i] >= deck[largest] ) largest = i;
+		  // opponent players will try to keep higher value cards
+	      if ( deck[i] >= deck[largestProbability] ) largestProbability = i;
 	  }
-	  System.out.println(Arrays.toString(deck));
-	  return largest;
+	  return largestProbability;
   }
   
   
@@ -328,15 +325,17 @@ public class simpleReflex implements Agent{
   
   public boolean allUnableToEliminate(State current) {
 	  int numPlayers = current.numPlayers();
-	  int count = 0;
+	  int canTarget = 0;
 	  
 	  for(int i=0; i<numPlayers; i++) {
-		  if(!current.eliminated(i) || !current.handmaid(i)) {
-			  count++;
+		  if((!current.eliminated(i)) || (!current.handmaid(i))) {
+			  if(i != myIndex) {
+				  canTarget++;
+			  }
 		  }
 	  }
 	  // if all the players are eliminated or hand-maiden
-	  if(count == 0) {
+	  if(canTarget == 0) {
 		  return true;
 	  }
 	  else {
