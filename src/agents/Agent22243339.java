@@ -11,7 +11,7 @@ import java.util.Map.Entry;
 
 // @author 22243339
 
-public class simpleReflex implements Agent{
+public class Agent22243339 implements Agent{
 
   private Random rand;
   private State current;
@@ -19,7 +19,7 @@ public class simpleReflex implements Agent{
   int topScorer;
   
   //0 place default constructor
-  public simpleReflex(){
+  public Agent22243339(){
     rand  = new Random();
   }
 
@@ -28,7 +28,7 @@ public class simpleReflex implements Agent{
   /**
    * Reports the agents name
    * */
-  public String toString(){return "simpleReflexAgent";}
+  public String toString(){return "bayesProbabilityAgent";}
 
 
   
