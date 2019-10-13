@@ -262,6 +262,7 @@ public class simpleReflex implements Agent{
 	  int largestProbability = 0;
 	  for (int i=0; i<8; i++)
 	  {
+		  // opponent players will try to keep higher value cards
 	      if ( deck[i] >= deck[largestProbability] ) largestProbability = i;
 	  }
 	  return largestProbability;
