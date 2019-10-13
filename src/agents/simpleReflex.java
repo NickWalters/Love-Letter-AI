@@ -190,7 +190,15 @@ public class simpleReflex implements Agent{
 			        case GUARD:
 			        	if(guardTargetFound) {
 			        		// guess prince (or King)
-			        		act = Action.playGuard(myIndex, guardTarget, Card.values()[4]);
+			        		int[] thisDeck = unseenDeck(current);
+			        		if(thisDeck[4] >= thisDeck[5]) {
+			        			// guess prince
+			        			act = Action.playGuard(myIndex, guardTarget, Card.values()[4]);
+			        		}
+			        		else {
+			        			// guess king
+			        			act = Action.playGuard(myIndex, guardTarget, Card.values()[5]);
+			        		}
 			        		break;
 			        	}
 			        	else {
@@ -242,6 +250,170 @@ public class simpleReflex implements Agent{
   
   // returns a guess for the guard. the guess is in the form of a Card
   public int guess(State current) {
+	  int[] deck = unseenDeck(current);
+	  
+	  int largestProbability = 0;
+	  for (int i=0; i<8; i++)
+	  {
+		  // opponent players will try to keep higher value cards
+	      if ( deck[i] >= deck[largestProbability] ) largestProbability = i;
+	  }
+	  return largestProbability;
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  // check to determine if the target opponent has played a countess last turn. returns true if yes
+  public boolean countessPlayed(State current, int player) {
+	  Iterator<Card> it = current.getDiscards(player);
+	  
+	  if(it == null) {
+		  return false;
+	  }
+
+	  while(it.hasNext()) {
+		  Card card = (Card)it.next();
+		  int cardValue = card.value();
+		  if(cardValue == 7) {
+			  return true;
+		  }
+		  else {
+			  return false;
+		  }
+	  }
+	return false;
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  public int getHighestPlayer(State state, int myIndex) {
+	  int players = state.numPlayers();
+	  HashMap<Integer, Integer> hashMap = new HashMap<>();
+	  int key = 0;
+	  int count = 0;
+	  
+	  for(int i=0; i<players; i++) {
+		  if(i != myIndex && !state.eliminated(i) && !state.handmaid(i)) {
+			  count++;
+			  hashMap.put(i, state.score(i));
+			  key = i;
+		     }
+	      }
+		  // protected by hand-maid, so do other statement
+		  if(count == 0) {
+			  return rand.nextInt(current.numPlayers());
+		  }
+	  
+	      int maxValueInMap=(Collections.max(hashMap.values()));
+	      for(Map.Entry<Integer, Integer> entry: hashMap.entrySet()){
+	    	  if(entry.getValue() == maxValueInMap) {
+	    		  key = entry.getKey();
+	    	  }
+	      }
+	  return key;
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  public boolean allUnableToEliminate(State current) {
+	  int numPlayers = current.numPlayers();
+	  int canTarget = 0;
+	  
+	  for(int i=0; i<numPlayers; i++) {
+		  if((!current.eliminated(i)) || (!current.handmaid(i))) {
+			  if(i != myIndex) {
+				  canTarget++;
+			  }
+		  }
+	  }
+	  // if all the players are eliminated or hand-maiden
+	  if(canTarget == 0) {
+		  return true;
+	  }
+	  else {
+		  return false;
+	  }
+  }
+  
+  
+  
+  
+  
+  
+  
+  private void fillKnownCards(State state, int myIndex, TreeMap<Integer,Integer> knownCards){
+      for(int i=0;i<state.numPlayers();i++){
+          if(i == myIndex) continue;
+          Card card = state.getCard(i);
+          if(card != null){
+              knownCards.put(i,state.getCard(i).value());
+          }
+      }
+  }
+ 
+  
+  
+  
+  
+  
+  private boolean playBaronOK(State current, Card c) {
+	  int[] deck = unseenDeck(current);
+	  int comparingCard = -1;
+	  
+	  if(current.getCard(myIndex).value() == 3) {
+		  comparingCard = c.value();
+	  }
+	  else{
+		  comparingCard = current.getCard(myIndex).value();
+	  }
+	  
+	  int unseenCount = 0;
+	  int countBelow = 0;
+	  int countAbove = 0;
+	  int i=0;
+	  for(int cardCount: deck) {
+		  // baron or less
+		  if(i+1<=comparingCard) {
+			  countBelow = countBelow + cardCount;
+			  unseenCount = unseenCount + cardCount;
+			  i++;
+		  }
+		  else {
+			  countAbove = countAbove + cardCount;
+			  unseenCount = unseenCount + cardCount;
+			  i++;
+		  }
+	  }
+	  float winProbability = (((float) countBelow) / unseenCount) * 100;
+	  
+	  if(winProbability > 60) {
+		  return true;
+	  }
+	  else {
+		  return false;
+	  }
+  }
+  
+  
+  
+  
+  private int[] unseenDeck(State current) {
 	  Card[] unseenCards = current.unseenCards();
 	  int[] deck = {0,0,0,0,0,0,0,0};
 	  
@@ -286,179 +458,7 @@ public class simpleReflex implements Agent{
 	  int indexOfDeduction = current.getCard(myIndex).value()-1;
 	  deck[indexOfDeduction] = deck[indexOfDeduction] - 1;
 	  
-	  int largestProbability = 0;
-	  for (int i=0; i<8; i++)
-	  {
-		  // opponent players will try to keep higher value cards
-	      if ( deck[i] >= deck[largestProbability] ) largestProbability = i;
-	  }
-	  return largestProbability;
-  }
-  
-  
-  
-  
-  // check to determine if the target opponent has played a countess last turn. returns true if yes
-  public boolean countessPlayed(State current, int player) {
-	  Iterator<Card> it = current.getDiscards(player);
-	  
-	  if(it == null) {
-		  return false;
-	  }
-
-	  while(it.hasNext()) {
-		  Card card = (Card)it.next();
-		  int cardValue = card.value();
-		  if(cardValue == 7) {
-			  return true;
-		  }
-		  else {
-			  return false;
-		  }
-	  }
-	return false;
-  }
-  
-  
-  public int getHighestPlayer(State state, int myIndex) {
-	  int players = state.numPlayers();
-	  HashMap<Integer, Integer> hashMap = new HashMap<>();
-	  int key = 0;
-	  int count = 0;
-	  
-	  for(int i=0; i<players; i++) {
-		  if(i != myIndex && !state.eliminated(i) && !state.handmaid(i)) {
-			  count++;
-			  hashMap.put(i, state.score(i));
-			  key = i;
-		     }
-	      }
-		  // protected by hand-maid, so do other statement
-		  if(count == 0) {
-			  return rand.nextInt(current.numPlayers());
-		  }
-	  
-	      int maxValueInMap=(Collections.max(hashMap.values()));
-	      for(Map.Entry<Integer, Integer> entry: hashMap.entrySet()){
-	    	  if(entry.getValue() == maxValueInMap) {
-	    		  key = entry.getKey();
-	    	  }
-	      }
-	  return key;
-  }
-  
-  
-  public boolean allUnableToEliminate(State current) {
-	  int numPlayers = current.numPlayers();
-	  int canTarget = 0;
-	  
-	  for(int i=0; i<numPlayers; i++) {
-		  if((!current.eliminated(i)) || (!current.handmaid(i))) {
-			  if(i != myIndex) {
-				  canTarget++;
-			  }
-		  }
-	  }
-	  // if all the players are eliminated or hand-maiden
-	  if(canTarget == 0) {
-		  return true;
-	  }
-	  else {
-		  return false;
-	  }
-  }
-  
-  
-  private void fillKnownCards(State state, int myIndex, TreeMap<Integer,Integer> knownCards){
-      for(int i=0;i<state.numPlayers();i++){
-          if(i == myIndex) continue;
-          Card card = state.getCard(i);
-          if(card != null){
-              knownCards.put(i,state.getCard(i).value());
-          }
-      }
-  }
-  
-  // calculates the probability of losing if you play the baron
-  // the agent will tolerate no more than a 40% chance of losing
-  private boolean playBaronOK(State current, Card c) {
-	  Card[] unseenCards = current.unseenCards();
-	  int[] deck = {0,0,0,0,0,0,0,0};
-	  int comparingCard = -1;
-	  
-	  if(current.getCard(myIndex).value() == 3) {
-		  comparingCard = c.value();
-	  }
-	  else{
-		  comparingCard = current.getCard(myIndex).value();
-	  }
-	  
-	  for(Card card: unseenCards){
-		  try {
-			  switch(card.value()) {
-			    case 1:
-			    	break;
-			  	//priest
-			  	case 2:
-			  		deck[1] = deck[1] + 1;
-			  		break;
-			  	//baron
-			  	case 3:
-			  		deck[2] = deck[2] + 1;
-			  		break;
-			  	//hand-maid
-			  	case 4:
-			  		deck[3] = deck[3] + 1;
-			  		break;
-			  	//prince
-			  	case 5:
-			  		deck[4] = deck[4] + 1;
-			  		break;
-			  	//king
-			  	case 6:
-			  		deck[5] = deck[5] + 1;
-			  		break;
-			  	//countess
-			  	case 7:
-			  		deck[6] = deck[6] + 1;
-			  		break;
-			  	// princess
-			  	case 8:
-			  		deck[7] = deck[7] + 1;
-			  		break;
-			  }
-			  
-		  }catch(Exception e){/*do nothing, just try again*/}	  
-	  }
-	  // minus the agents current hand
-	  int indexOfDeduction = current.getCard(myIndex).value()-1;
-	  deck[indexOfDeduction] = deck[indexOfDeduction] - 1;
-	  
-	  int unseenCount = 0;
-	  int countBelow = 0;
-	  int countAbove = 0;
-	  int i=0;
-	  for(int cardCount: deck) {
-		  // baron or less
-		  if(i+1<=comparingCard) {
-			  countBelow = countBelow + cardCount;
-			  unseenCount = unseenCount + cardCount;
-			  i++;
-		  }
-		  else {
-			  countAbove = countAbove + cardCount;
-			  unseenCount = unseenCount + cardCount;
-			  i++;
-		  }
-	  }
-	  float winProbability = (((float) countBelow) / unseenCount) * 100;
-	  
-	  if(winProbability > 60) {
-		  return true;
-	  }
-	  else {
-		  return false;
-	  }
+	  return deck;
   }
   
 }
