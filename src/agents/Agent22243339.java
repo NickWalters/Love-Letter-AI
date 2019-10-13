@@ -280,7 +280,12 @@ public class Agent22243339 implements Agent{
   
   
   
-  // returns a guess for the guard. the guess is in the form of a Card
+  
+  /**
+   * Guesses the value that the opponent may have, and gives the value/number of the card
+   * @param state: the state of the game to extract information from
+   * @return int the card (value) guess of what the opponent may have
+   * **/
   public int guess(State current) {
 	  int[] deck = unseenDeck(current);
 	  
@@ -300,7 +305,13 @@ public class Agent22243339 implements Agent{
   
   
   
-  // check to determine if the target opponent has played a countess last turn. returns true if yes
+  
+  /**
+   * check to determine if the target opponent has played a countess last turn
+   * @param state: the state of the game to extract information from
+   * @param player: the player to check if they have played the countess in the last move
+   * @return true the player played the countess recently
+   * **/
   public boolean countessPlayed(State current, int player) {
 	  Iterator<Card> it = current.getDiscards(player);
 	  
@@ -328,7 +339,12 @@ public class Agent22243339 implements Agent{
   
   
   
-  
+  /**
+   * This method will get the player who has the highest current score in the game so far
+   * @param state : the state of the game to extract information from
+   * @param myIndex : the index of the agent
+   * @return the index of the opponent
+   * **/
   public int getHighestPlayer(State state, int myIndex) {
 	  int players = state.numPlayers();
 	  HashMap<Integer, Integer> hashMap = new HashMap<>();
@@ -362,7 +378,11 @@ public class Agent22243339 implements Agent{
   
   
   
-  
+  /**
+   * Checks if all the current players are protected by hand-maid or are eliminated
+   * @param state: the state of the game to extract information from
+   * @return true if you are unable to eliminate any other remaining players in the round
+   * **/
   public boolean allUnableToEliminate(State current) {
 	  int numPlayers = current.numPlayers();
 	  int canTarget = 0;
@@ -388,7 +408,12 @@ public class Agent22243339 implements Agent{
   
   
   
-  
+  /**
+   * 
+   * @param state : the state of the game to extract information from
+   * @param myIndex : the index of the agent
+   * @param knownCards : the cards array which are known by using the priest
+   * **/
   private void fillKnownCards(State state, int myIndex, TreeMap<Integer,Integer> knownCards){
       for(int i=0;i<state.numPlayers();i++){
           if(i == myIndex) continue;
@@ -402,8 +427,12 @@ public class Agent22243339 implements Agent{
   
   
   
-  
-  
+  /**
+   * As playing baron is a Risky move, this method calculates the likelihood that you would lose
+   * @return false if you shouldn't play the baron
+   * @return true if you should play the baron
+   * @param state: the state of the game to extract information from
+   * **/
   private boolean playBaronOK(State current, Card c) {
 	  int[] deck = unseenDeck(current);
 	  int comparingCard = -1;
@@ -444,7 +473,11 @@ public class Agent22243339 implements Agent{
   
   
   
-  
+  /**
+   * this function gives an array indexed by each card possibility, which shows the amount of unseen cards
+   * @param state: the state of the game to extract information from
+   * @return int[] an array of the cards that are unseen
+   * **/
   private int[] unseenDeck(State current) {
 	  Card[] unseenCards = current.unseenCards();
 	  int[] deck = {0,0,0,0,0,0,0,0};
