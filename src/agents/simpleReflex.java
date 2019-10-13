@@ -267,6 +267,7 @@ public class simpleReflex implements Agent{
 	  {
 	      if ( deck[i] >= deck[largest] ) largest = i;
 	  }
+	  System.out.println(Arrays.toString(deck));
 	  return largest;
   }
   
