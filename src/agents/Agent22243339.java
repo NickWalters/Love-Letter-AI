@@ -16,7 +16,7 @@ public class Agent22243339 implements Agent{
   private Random rand;
   private State current;
   private int myIndex;
-  int topScorer;
+  // int topScorer;
   
   //0 place default constructor
   public Agent22243339(){
@@ -287,7 +287,7 @@ public class Agent22243339 implements Agent{
    * @param drawnCard the drawnCard at the start of the turn so you can subtract this number from unseen deck
    * @return int the card (value) guess of what the opponent may have
    * **/
-  public int guess(State current, Card drawnCard) {
+  private int guess(State current, Card drawnCard) {
 	  int[] deck = unseenDeck(current, drawnCard);
 	  
 	  int largestProbability = 0;
@@ -313,7 +313,7 @@ public class Agent22243339 implements Agent{
    * @param player: the player to check if they have played the countess in the last move
    * @return true the player played the countess recently
    * **/
-  public boolean countessPlayed(State current, int player) {
+  private boolean countessPlayed(State current, int player) {
 	  Iterator<Card> it = current.getDiscards(player);
 	  
 	  if(it == null) {
@@ -346,7 +346,7 @@ public class Agent22243339 implements Agent{
    * @param myIndex : the index of the agent
    * @return the index of the opponent
    * **/
-  public int getHighestPlayer(State state, int myIndex) {
+  private int getHighestPlayer(State state, int myIndex) {
 	  int players = state.numPlayers();
 	  HashMap<Integer, Integer> hashMap = new HashMap<>();
 	  int key = 0;
@@ -384,7 +384,7 @@ public class Agent22243339 implements Agent{
    * @param state: the state of the game to extract information from
    * @return true if you are unable to eliminate any other remaining players in the round
    * **/
-  public boolean allUnableToEliminate(State current) {
+  private boolean allUnableToEliminate(State current) {
 	  int numPlayers = current.numPlayers();
 	  int canTarget = 0;
 	  
