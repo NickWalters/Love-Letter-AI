@@ -284,6 +284,7 @@ public class Agent22243339 implements Agent{
   /**
    * Guesses the value that the opponent may have, and gives the value/number of the card
    * @param state: the state of the game to extract information from
+   * @param drawnCard the drawnCard at the start of the turn so you can subtract this number from unseen deck
    * @return int the card (value) guess of what the opponent may have
    * **/
   public int guess(State current, Card drawnCard) {
@@ -292,7 +293,7 @@ public class Agent22243339 implements Agent{
 	  int largestProbability = 0;
 	  for (int i=0; i<8; i++)
 	  {
-		  // opponent players will try to keep higher value cards
+		  // opponent players will try to keep higher value cards, find highest value & count card tradeoff
 	      if ( deck[i] >= deck[largestProbability] ) largestProbability = i;
 	  }
 	  return largestProbability;
