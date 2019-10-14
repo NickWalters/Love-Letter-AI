@@ -159,7 +159,7 @@ public class Agent22243339 implements Agent{
 		  
 		  
 		  // FINAL STEP
-		  // check if your targets are eliminated (or countess)
+		  // check if your targets are eliminated (or hand-maid), if not all eliminated then proceed with choosing target
 		  if(allUnableToEliminate(current)) {
 			  Card hCard = current.getCard(myIndex);
 			  Card dCard = c;
@@ -190,7 +190,7 @@ public class Agent22243339 implements Agent{
 			        case GUARD:
 			        	if(guardTargetFound) {
 			        		// person has played a countess, so likely has a king or prince
-			        		int[] thisDeck = unseenDeck(current);
+			        		int[] thisDeck = unseenDeck(current, c);
 			        		if(thisDeck[4] >= thisDeck[5]) {
 			        			// guess prince
 			        			act = Action.playGuard(myIndex, guardTarget, Card.values()[4]);
@@ -203,7 +203,7 @@ public class Agent22243339 implements Agent{
 			        	}
 			        	else {
 			        		guardTarget = rand.nextInt(current.numPlayers());
-			        		act = Action.playGuard(myIndex, target, Card.values()[guess(current)]);
+			        		act = Action.playGuard(myIndex, target, Card.values()[guess(current, c)]);
 			        		break;
 			        	}
 		            case PRIEST:
@@ -286,8 +286,8 @@ public class Agent22243339 implements Agent{
    * @param state: the state of the game to extract information from
    * @return int the card (value) guess of what the opponent may have
    * **/
-  public int guess(State current) {
-	  int[] deck = unseenDeck(current);
+  public int guess(State current, Card drawnCard) {
+	  int[] deck = unseenDeck(current, drawnCard);
 	  
 	  int largestProbability = 0;
 	  for (int i=0; i<8; i++)
@@ -434,7 +434,7 @@ public class Agent22243339 implements Agent{
    * @param state: the state of the game to extract information from
    * **/
   private boolean playBaronOK(State current, Card c) {
-	  int[] deck = unseenDeck(current);
+	  int[] deck = unseenDeck(current, c);
 	  int comparingCard = -1;
 	  
 	  if(current.getCard(myIndex).value() == 3) {
@@ -478,7 +478,7 @@ public class Agent22243339 implements Agent{
    * @param state: the state of the game to extract information from
    * @return int[] an array of the cards that are unseen
    * **/
-  private int[] unseenDeck(State current) {
+  private int[] unseenDeck(State current, Card drawnCard) {
 	  Card[] unseenCards = current.unseenCards();
 	  int[] deck = {0,0,0,0,0,0,0,0};
 	  
@@ -521,7 +521,9 @@ public class Agent22243339 implements Agent{
 	  }
 	  // minus the agents current hand
 	  int indexOfDeduction = current.getCard(myIndex).value()-1;
+	  int drawnIndexDeduct = drawnCard.value()-1;
 	  deck[indexOfDeduction] = deck[indexOfDeduction] - 1;
+	  deck[drawnIndexDeduct] = deck[drawnIndexDeduct] - 1;
 	  
 	  return deck;
   }
