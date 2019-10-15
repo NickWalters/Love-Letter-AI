@@ -16,7 +16,6 @@ public class Agent22243339 implements Agent{
   private Random rand;
   private State current;
   private int myIndex;
-  // int topScorer;
   
   //0 place default constructor
   public Agent22243339(){
@@ -118,6 +117,7 @@ public class Agent22243339 implements Agent{
 		  }
 		  
 		  
+		  
 		  // check if a player has played a countess recently
 		  boolean guardTargetFound = false; // only use with guard
 		  int guardTarget = rand.nextInt(current.numPlayers());		
@@ -143,6 +143,24 @@ public class Agent22243339 implements Agent{
 				  play = current.getCard(myIndex);
 			  }else {
 				  play = c;
+			  }
+			  // playing the king can be a risk, if you know that the probability that others have a lower value card is high
+			  if(play.value() == 6) {
+				  System.out.println("CONSIDERING KING_______________________________________________________________________________________________");
+				  System.out.println("CONSIDERING KING_______________________________________________________________________________________________");
+				  System.out.println("CONSIDERING KING_______________________________________________________________________________________________");
+				  if(playKingOK(current, c) == false) {
+					  System.out.println("____________________________________________________________________________________");
+					  System.out.println("____________________________________________________________________________________");
+					  System.out.println("____________________________________________________________________________________");
+					  if(current.getCard(myIndex).value() == 6) {
+						  play = c;
+					  }
+					  if(c.value() == 6) {
+						  play = current.getCard(myIndex);
+					  }
+				  }
+				  
 			  }
 			// if you have a baron, then playing this can be a Risk. Agent will Check if its OK
 			  if(play.value() == 3) {
@@ -527,6 +545,45 @@ public class Agent22243339 implements Agent{
 	  deck[drawnIndexDeduct] = deck[drawnIndexDeduct] - 1;
 	  
 	  return deck;
+  }
+  
+  
+  private boolean playKingOK(State current, Card c) {
+	  int[] deck = unseenDeck(current, c);
+	  int comparingCard = -1;
+	  
+	  if(current.getCard(myIndex).value() == 6) {
+		  comparingCard = c.value();
+	  }
+	  else{
+		  comparingCard = current.getCard(myIndex).value();
+	  }
+	  
+	  int unseenCount = 0;
+	  int countBelow = 0;
+	  int countAbove = 0;
+	  int i=0;
+	  for(int cardCount: deck) {
+		  // baron or less
+		  if(i+1<=comparingCard) {
+			  countBelow = countBelow + cardCount;
+			  unseenCount = unseenCount + cardCount;
+			  i++;
+		  }
+		  else {
+			  countAbove = countAbove + cardCount;
+			  unseenCount = unseenCount + cardCount;
+			  i++;
+		  }
+	  }
+	  float winProbability = (((float) countBelow) / unseenCount) * 100;
+	  
+	  if(winProbability > 50) {
+		  return true;
+	  }
+	  else {
+		  return false;
+	  }
   }
   
 }
