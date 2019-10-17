@@ -63,7 +63,9 @@ System.out.println("Player "+gameState.nextPlayer()+" draws the "+topCard);
           catch(IllegalActionException e){
             ps.println("ILLEGAL ACTION PERFORMED BY PLAYER "+agents[gameState.nextPlayer()]+
               "("+gameState.nextPlayer()+")\nRandom Move Substituted");
+            rando.newRound(gameState.playerState(gameState.nextPlayer()));
             act = rando.playCard(topCard);
+            ps.println(gameState.update(act,topCard));
           }
           for(int p = 0; p<numPlayers; p++)
             agents[p].see(act,playerStates[p]);
@@ -87,7 +89,7 @@ System.out.println("New Round, scores are:\nplayer 0:"+gameState.score(0)+"\npla
    * The agent implementations should be in the default package.
    * */
   public static void main(String[] args){
-    Agent[] agents = {new agents.RandomAgent(),new agents.RandomAgent(), new agents.basicAgent(), new agents.Agent22243339()};
+    Agent[] agents = {new agents.RandomAgent(),new agents.RandomAgent(), new agents.BorkedAgent(), new agents.BorkedAgent()};
     LoveLetter env = new LoveLetter();
     StringBuffer log = new StringBuffer("A simple game for four random agents:\n");
     int[] results = env.playGame(agents);

@@ -179,15 +179,14 @@ public class Agent22243339 implements Agent{
 		  // FINAL STEP
 		  // check if your targets are eliminated (or hand-maid), if not all eliminated then proceed with choosing target
 		  if(allUnableToEliminate(current)) {
-			  Card hCard = current.getCard(myIndex);
-			  Card dCard = c;
+			  target = getHighestPlayer(current, myIndex);
 			  // play the prince on yourself
-			  if(hCard.value() == 5) {
-				  play = hCard;
+			  if(current.getCard(myIndex).value() == 5) {
+				  play = current.getCard(myIndex);
 				  target = myIndex;
 			  }
-			  else if(dCard.value() == 5) {
-				  play = dCard;
+			  else if(c.value() == 5) {
+				  play = c;
 				  target = myIndex;
 			  }
 			  else {
@@ -197,9 +196,10 @@ public class Agent22243339 implements Agent{
 			  }
 		  }
 		  else {
-			  target = getHighestPlayer(current, myIndex);
+			  System.out.println("else statement");
+			  target = rand.nextInt(current.numPlayers());
+			  // target = getHighestPlayer(current, myIndex);
 		  }
-		  
 		  
 		  // TARGET and PLAY has been found, execute main statement
 		  try {

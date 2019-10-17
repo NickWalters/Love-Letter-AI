@@ -16,7 +16,7 @@ import java.util.LinkedList;
  * An interface for representing an agent in the game Love Letter
  * All agent's must have a 0 parameter constructor
  * */
-public class Agent_22232803 implements Agent{
+public class exampleAgent implements Agent{
 
   private Random rand;
   private State current;
@@ -27,7 +27,7 @@ public class Agent_22232803 implements Agent{
   
 
   //0 place default constructor
-  public Agent_22232803(){
+  public exampleAgent(){
     rand  = new Random();
   }
 

@@ -6,21 +6,21 @@ import java.util.Random;
  * An interface for representing an agent in the game Love Letter
  * All agent's must have a 0 parameter constructor
  * */
-public class RandomAgent implements Agent{
+public class BorkedAgent implements Agent{
 
   private Random rand;
   private State current;
   private int myIndex;
 
   //0 place default constructor
-  public RandomAgent(){
+  public BorkedAgent(){
     rand  = new Random();
   }
 
   /**
    * Reports the agents name
    * */
-  public String toString(){return "Rando";}
+  public String toString(){return "Bork";}
 
 
   /**
@@ -50,7 +50,8 @@ public class RandomAgent implements Agent{
   public Action playCard(Card c){
     Action act = null;
     Card play;
-    while(!current.legalAction(act, c)){
+    boolean legal=false;
+    while(!legal){
       if(rand.nextDouble()<0.5) play= c;
       else play = current.getCard(myIndex);
       int target = rand.nextInt(current.numPlayers());
@@ -78,9 +79,10 @@ public class RandomAgent implements Agent{
             act = Action.playCountess(myIndex);
             break;
           default:
-            act = null;//never play princess
+            act = Action.playPrincess(myIndex);
         }
-      }catch(IllegalActionException e){/*do nothing*/}
+        legal=true;
+      }catch(IllegalActionException e){/*do nothing, just try again*/}  
     }
     return act;
   }
