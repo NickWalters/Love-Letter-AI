@@ -196,9 +196,7 @@ public class Agent22243339 implements Agent{
 			  }
 		  }
 		  else {
-			  System.out.println("else statement");
-			  target = rand.nextInt(current.numPlayers());
-			  // target = getHighestPlayer(current, myIndex);
+			  target = getHighestPlayer(current, myIndex);
 		  }
 		  
 		  // TARGET and PLAY has been found, execute main statement
