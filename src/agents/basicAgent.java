@@ -49,9 +49,10 @@ public class basicAgent implements Agent{
    * */
   public Action playCard(Card c){
     Action act = null;
-    Card play;
+    Card play = null;
     int drawnCard = c.value();
 	int handCard = current.getCard(myIndex).value();
+	boolean alreadyDecided = false;
     
 	  // this checks if you have a countess needing to be played
 	  if((handCard == 7 || drawnCard == 7)) {
