@@ -11,14 +11,14 @@ import java.util.Map.Entry;
 
 // @author 22243339
 
-public class Agent22243339 implements Agent{
+public class heuristicAgent implements Agent{
 
   private Random rand;
   private State current;
   private int myIndex;
   
   //0 place default constructor
-  public Agent22243339(){
+  public heuristicAgent(){
     rand  = new Random();
   }
 
@@ -27,7 +27,7 @@ public class Agent22243339 implements Agent{
   /**
    * Reports the agents name
    * */
-  public String toString(){return "bayesProbabilityAgent";}
+  public String toString(){return "heuristicAgent";}
 
 
   
@@ -212,8 +212,16 @@ public class Agent22243339 implements Agent{
 			        		break;
 			        	}
 			        	else {
-			        		guardTarget = rand.nextInt(current.numPlayers());
-			        		act = Action.playGuard(myIndex, target, Card.values()[guess(current, c)]);
+			        		// guardTarget = rand.nextInt(current.numPlayers());
+			        		int[] thisDeck = unseenDeck(current, c);
+			        		int[] newDeck = applySelectionBias(current, thisDeck, c, target);
+			        		System.out.println("________________________________________________________________________________________________________________________");
+			        		System.out.println("________________________________________________________________________________________________________________________");
+			        		System.out.println("deck: " + Arrays.toString(thisDeck));
+			        		System.out.println("newDeck: " + Arrays.toString(newDeck));
+			        		System.out.println("________________________________________________________________________________________________________________________");
+			        		System.out.println("________________________________________________________________________________________________________________________");
+			        		act = Action.playGuard(myIndex, target, Card.values()[guess(current, c, target)]);
 			        		break;
 			        	}
 		            case PRIEST:
@@ -297,8 +305,9 @@ public class Agent22243339 implements Agent{
    * @param drawnCard the drawnCard at the start of the turn so you can subtract this number from unseen deck
    * @return int the card (value) guess of what the opponent may have
    * **/
-  private int guess(State current, Card drawnCard) {
-	  int[] deck = unseenDeck(current, drawnCard);
+  private int guess(State current, Card drawnCard, int opponent) {
+	  int[] beforeDeck = unseenDeck(current, drawnCard);
+	  int[] deck = applySelectionBias(current, beforeDeck, drawnCard, opponent);
 	  
 	  int largestProbability = 0;
 	  for (int i=0; i<8; i++)
@@ -446,6 +455,8 @@ public class Agent22243339 implements Agent{
    * **/
   private boolean playBaronOK(State current, Card c) {
 	  int[] deck = unseenDeck(current, c);
+	  System.out.println("deck: " + Arrays.toString(deck));
+	  
 	  int comparingCard = -1;
 	  
 	  if(current.getCard(myIndex).value() == 3) {
@@ -576,6 +587,49 @@ public class Agent22243339 implements Agent{
 	  else {
 		  return false;
 	  }
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  // this function will apply a greater utility reward for cards which are unseen, and are of higher value than what a player has discarded.
+  private int[] applySelectionBias(State current, int[] deck, Card drawnCard, int opponent) {
+	  int[] newDeck = deck.clone();
+	  Card lastPlayed = drawnCard; 
+	  
+	  // get the last discarded card of that opponent that you have chosen
+	  Iterator<Card> it = current.getDiscards(opponent);  
+	  if(it == null) {
+		  return null;
+	  }  
+	  while(it.hasNext()) {
+		  lastPlayed = (Card)it.next();
+		  break;
+	  }
+	  
+	  int valueOfDiscard = lastPlayed.value();
+	  int i=0;
+	  for(Integer count: deck) {
+		  if(i+1 >= valueOfDiscard) {
+			  // add a reward +1 for every card that is greater than his last discarded card (reinforcement utility) but still allowing exploration of frequently occurring lower value cards
+			  if(count > 0) {
+				  newDeck[i] = newDeck[i] + 1;
+			  }
+		  }
+		  i++;
+	  }
+	  System.out.println("___");
+	  System.out.println("opponentDiscard: " + valueOfDiscard);
+	  System.out.println("___");
+	  return newDeck;
   }
   
 }
