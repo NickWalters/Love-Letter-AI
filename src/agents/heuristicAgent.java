@@ -213,14 +213,6 @@ public class heuristicAgent implements Agent{
 			        	}
 			        	else {
 			        		// guardTarget = rand.nextInt(current.numPlayers());
-			        		int[] thisDeck = unseenDeck(current, c);
-			        		int[] newDeck = applySelectionBias(current, thisDeck, c, target);
-			        		System.out.println("________________________________________________________________________________________________________________________");
-			        		System.out.println("________________________________________________________________________________________________________________________");
-			        		System.out.println("deck: " + Arrays.toString(thisDeck));
-			        		System.out.println("newDeck: " + Arrays.toString(newDeck));
-			        		System.out.println("________________________________________________________________________________________________________________________");
-			        		System.out.println("________________________________________________________________________________________________________________________");
 			        		act = Action.playGuard(myIndex, target, Card.values()[guess(current, c, target)]);
 			        		break;
 			        	}
@@ -626,9 +618,6 @@ public class heuristicAgent implements Agent{
 		  }
 		  i++;
 	  }
-	  System.out.println("___");
-	  System.out.println("opponentDiscard: " + valueOfDiscard);
-	  System.out.println("___");
 	  return newDeck;
   }
   

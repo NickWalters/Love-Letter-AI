@@ -18,12 +18,12 @@ public class Stats extends LoveLetter{
     }
 
     public static void getData() {
-        Agent[] agents = {new RandomAgent(),new BorkedAgent(), new Agent22243339(), new heuristicAgent()};
+        Agent[] agents = {new RandomAgent(),new BorkedAgent(), new heuristicAgent(), new Agent22243339()};
 
-        String[] columnName = {"Agent","Win Rate (Out of 100 games)", "Avg score per game"};
+        String[] columnName = {"Agent","Win Rate (Out of 1000 games)", "Avg score per game"};
         double[][] dataTable = new double[4][3];
 
-        for(int i = 0; i < 100; i++) {
+        for(int i = 0; i < 1000; i++) {
             LoveLetter game = new LoveLetter();
             int[] data = game.playGame(agents);
 
