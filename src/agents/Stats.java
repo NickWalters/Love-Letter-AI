@@ -1,9 +1,14 @@
-package loveletter;
+package agents;
+import loveletter.*;
+
 
 import java.util.Arrays;
 
-import agents.Agent_22232803;
+import agents.Agent22243339;
 import agents.RandomAgent;
+import agents.heuristicAgent;
+import agents.BorkedAgent;
+import agents.exampleAgent;
 
 
 public class Stats extends LoveLetter{
@@ -13,7 +18,7 @@ public class Stats extends LoveLetter{
     }
 
     public static void getData() {
-        Agent[] agents = {new Agent_22232803(),new Agent_22232803(), new Agent_22232803(), new Agent_22232803()};
+        Agent[] agents = {new RandomAgent(),new BorkedAgent(), new Agent22243339(), new heuristicAgent()};
 
         String[] columnName = {"Agent","Win Rate (Out of 100 games)", "Avg score per game"};
         double[][] dataTable = new double[4][3];
