@@ -17,7 +17,7 @@ public class Stats extends LoveLetter{
     }
 
     public static void getData() {
-        Agent[] agents = {new RandomAgent(),new Agent21938451(), new Agent22243339(), new heuristicAgent()};
+        Agent[] agents = {new RandomAgent(),new heuristicAgent(), new Agent22243339(), new Agent21938451()};
 
         String[] columnName = {"Agent","Win Rate (Out of 100 games)", "Avg score per game"};
         double[][] dataTable = new double[4][3];
