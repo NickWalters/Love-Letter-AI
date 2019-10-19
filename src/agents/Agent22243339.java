@@ -16,6 +16,7 @@ public class Agent22243339 implements Agent{
   private Random rand;
   private State current;
   private int myIndex;
+  int plays;
   
   //0 place default constructor
   public Agent22243339(){
@@ -39,6 +40,7 @@ public class Agent22243339 implements Agent{
   public void newRound(State start){
     current = start;
     myIndex = current.getPlayerIndex();
+    plays = 0;
   }
 
   
@@ -65,6 +67,7 @@ public class Agent22243339 implements Agent{
    * @throws IllegalActionException when the Action produced is not legal.
    * */
   public Action playCard(Card c){
+	  plays++;
 	  Action act = null;
 	  Card play = null;
 	  int drawnCard = c.value();
@@ -117,6 +120,31 @@ public class Agent22243339 implements Agent{
 		  }
 		  
 		  
+		  // prefer keeping the guard over the priest
+		  else if((handCard ==2) || (drawnCard==2)) {
+			  if(handCard == 2 && drawnCard == 1) {
+				  play = c;
+				  alreadyDecided = true;
+			  }
+			  if((drawnCard==2) || (handCard==1)){
+				  play = current.getCard(myIndex);
+				  alreadyDecided = true;
+			  }
+		  }
+		  
+		  // if you have a hand-maid, play it early in the game	  
+		  else if((handCard ==4) || (drawnCard==4)) {
+			  if(plays <= 1) {
+				  if(handCard == 4) {
+					  play = current.getCard(myIndex);
+					  alreadyDecided = true;
+				  }
+				  if(drawnCard == 4) {
+					  play = c;
+					  alreadyDecided = true;
+				  }
+			  }
+		  }
 		  
 		  // check if a player has played a countess recently
 		  boolean guardTargetFound = false; // only use with guard
