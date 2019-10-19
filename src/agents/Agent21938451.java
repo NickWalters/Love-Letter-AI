@@ -2,14 +2,12 @@ package agents;
 import loveletter.*;
 
 import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * An interface for representing an agent in the game Love Letter
  * All agent's must have a 0 parameter constructor
  * */
-
-
+//@author 21938451
 public class Agent21938451 implements Agent{
 
   private Random rand;
@@ -23,8 +21,6 @@ public class Agent21938451 implements Agent{
     rand  = new Random();
   }
 
-  
-  
   /**
    * Reports the agents name
    * */
@@ -86,33 +82,8 @@ public class Agent21938451 implements Agent{
 	  int target = rand.nextInt(current.numPlayers());
 	  
 	  while(!current.legalAction(act, c)) {
-		  
-		  // this checks if you have a countess needing to be played
-		  if((handCard == 7 || drawnCard == 7)) {
-            // king
-	        if(handCard == 6 || drawnCard == 6) {
-	          if(drawnCard == 7) {
-	        	  play = c;
-	        	  alreadyDecided = true;
-	          }else{
-	        	  play = current.getCard(myIndex);
-	        	  alreadyDecided = true;
-	          }
-	        }
-            // prince
-	        if(handCard == 5 || drawnCard == 5) {
-	          if(drawnCard == 7) {
-	        	  play = c;
-	        	  alreadyDecided = true;
-	          }else {
-	        	  play = current.getCard(myIndex);
-	        	  alreadyDecided = true;
-	          }
-	        }
-	      }
 		  boolean baronTargetFound = false;
-
-		  // Baron and Princess 
+		// Baron and Princess 
 		  if((handCard==3)||(drawnCard==3)) {
 			  if(handCard==8 || drawnCard==8) {
 				  baronTargetFound = true;
@@ -138,6 +109,32 @@ public class Agent21938451 implements Agent{
 			  }
 		  }
 		  
+		  // this checks if you have a countess needing to be played
+		  if((handCard == 7 || drawnCard == 7)) {
+            // king
+	        if(handCard == 6 || drawnCard == 6) {
+	          if(drawnCard == 7) {
+	        	  play = c;
+	        	  alreadyDecided = true;
+	          }else{
+	        	  play = current.getCard(myIndex);
+	        	  alreadyDecided = true;
+	          }
+	        }
+            // prince
+	        if(handCard == 5 || drawnCard == 5) {
+	          if(drawnCard == 7) {
+	        	  play = c;
+	        	  alreadyDecided = true;
+	          }else {
+	        	  play = current.getCard(myIndex);
+	        	  alreadyDecided = true;
+	          }
+	        }
+	      }
+
+		  
+		  
 		  // if you have a princess, play the other lower value card.
 		  if((handCard ==8) || (drawnCard==8)) {
 			  if(handCard == 8) {
@@ -149,9 +146,7 @@ public class Agent21938451 implements Agent{
 				  alreadyDecided = true;
 			  }
 		  }
-		  
-		  
-		  
+
 		  //play the lowest value card
 		  if (alreadyDecided == false) {
 			  if(handCard <= drawnCard) {
@@ -161,7 +156,6 @@ public class Agent21938451 implements Agent{
 			  }
 		  }
 		  
-
 		  //check if player played countess for the last turn 
 		  boolean targetFoundAlready = false; // only use with guard
 		  int guardTarget = rand.nextInt(current.numPlayers());		
