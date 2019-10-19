@@ -10,7 +10,7 @@ import java.util.Map.Entry;
  * */
 
 
-public class Agent21938451 implements Agent{
+public class simpleReflex2 implements Agent{
 
   private Random rand;
   private State current;
@@ -19,7 +19,7 @@ public class Agent21938451 implements Agent{
   int topScorer=0;
   
   //0 place default constructor
-  public Agent21938451(){
+  public simpleReflex2(){
     rand  = new Random();
   }
 
