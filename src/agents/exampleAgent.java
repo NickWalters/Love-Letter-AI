@@ -5,6 +5,7 @@ import loveletter.*;
 import java.util.Random;
 import java.util.Queue;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 
 
@@ -44,6 +45,8 @@ public class exampleAgent implements Agent{
   public void newRound(State start){
     current = start;
     round++;
+    System.out.println("============================================>"+oppHand);
+
     oppHand.clear();
     myIndex = current.getPlayerIndex(); //gets the player index
   }
@@ -101,6 +104,7 @@ public class exampleAgent implements Agent{
         Card discardCard = current.getDiscards(target).next();
         if(!oppCard.equals(discardCard)){
           KnownHand oppHand = new KnownHand(target, oppCard);
+
           return oppHand;
         }
       }
